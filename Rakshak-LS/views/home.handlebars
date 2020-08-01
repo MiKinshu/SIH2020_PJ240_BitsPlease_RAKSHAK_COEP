@@ -73,9 +73,9 @@
                         Is there a emergency in your network? Type some information and raise alerts.
 
 
-                        <form action="http://192.168.43.71:3001/raiseAlert" method="POST">
+                        <form action="https://rakshak-zs.herokuapp.com/raiseAlert" method="POST">
                             <input style="margin-top:20px;" type="text" name="info" placeholder="Short Info" />
-                            <input type="hidden" value="{{network.networkId}}" name="uid">
+                            <input type="hidden" value="{{network.networkId}}" name="networkId">
                             <button class="button" style="background-color:#FC4660; border-color:white;"
                                 type="submit">Emergency</button>
                         </form>
@@ -124,7 +124,7 @@
                             <h3>Your Server URL: {{network.networkId}} </h3>
                         </div>
                         <div class="card-block">
-                            <form method="POST" action="http://192.168.43.71:3001/networks/setUrl">
+                            <form method="POST" action="https://rakshak-zs.herokuapp.com/networks/setUrl">
                                 <fieldset>
                                     <label for="nameField">URL</label>
                                     <input type="text" placeholder="new URL" id="url">

@@ -56,7 +56,7 @@ app.get("/home", (req, res) => {
         alert = true;
     }
     request.post(
-        "http://192.168.43.71:3001/networks/me", {
+        "https://rakshak-zs.herokuapp.com/networks/me", {
             json: { accessToken: token }
         },
         function(error, response, body) {
@@ -66,7 +66,7 @@ app.get("/home", (req, res) => {
             } else {
                 network = response.body.network;
                 console.log(network);
-                let url = "http://192.168.43.71:3001/networks/" + network.networkId + "/requests";
+                let url = "https://rakshak-zs.herokuapp.com/networks/" + network.networkId + "/requests";
                 console.log(url);
                 request.post(
                     url, {
@@ -93,7 +93,7 @@ app.post("/register", (req, res) => {
     var request = require("request");
     console.log(req.body);
     request.post(
-        "http://192.168.43.71:3001/networks/register", { json: { name:req.body.name, networkId: req.body.id, password: req.body.password } },
+        "https://rakshak-zs.herokuapp.com/networks/register", { json: { name:req.body.name, networkId: req.body.id, password: req.body.password } },
         function(error, response, body) {
             if (!error && response != null & response.body.auth == true) {
                 res.cookie("auth", response.body.token);
@@ -114,7 +114,7 @@ app.post("/login", (req, res) => {
     var request = require("request");
     console.log(req.body);
     request.post(
-        "http://192.168.43.71:3001/networks/login", { json: { networkId: req.body.id, password: req.body.password } },
+        "https://rakshak-zs.herokuapp.com/networks/login", { json: { networkId: req.body.id, password: req.body.password } },
         function(error, response, body) {
             //  console.log(response);
             if (!error && response.body.auth == true) {
