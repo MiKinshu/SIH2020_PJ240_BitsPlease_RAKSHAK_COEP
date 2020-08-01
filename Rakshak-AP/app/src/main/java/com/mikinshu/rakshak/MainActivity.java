@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         //Application logic.
         Log.d(TAG, "SetupApplication: Called");
         AskPermissions();
-        startService(new Intent(getApplicationContext(), Listener.class));
+        //startService(new Intent(getApplicationContext(), Listener.class));
 
         if(isNetworkAvailable()){
             //set up the network features.

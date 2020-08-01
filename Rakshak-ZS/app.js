@@ -2,9 +2,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const admin = require("./firebase");
-const request = require("request");
 const mongoose = require("mongoose");
 const Report = require("./Report");
+const Network = require("./network/network")
 
 //Initializing the app
 const app = express();
@@ -53,26 +53,21 @@ app.get("/", (req, res)=>{
     res.send("Hi!");
 });
 
-
+// route to view all reports
 app.get("/reports", (req, res)=>{
     Report.find({}, function(err, reports){
         console.log(req.params.networkId);
-        let response  = [];
-        reports.forEach(element => {
-              let temp = {
-                uid: element.uid,
-                msg: element.msg,
-                type: element.type,
-                date: element.date,
-                name: element.name,
-                networkId: element.networkId
-              };
-              response.push(temp);
-              console.log(temp);
-        });
-        response.reverse();
-        res.send(response);
+        res.send(reports);
     });
+});
+
+//route to register on a network
+app.post("/usenetwork", (req, res)=>{
+  console.log(req.body);
+  Network.findOne({networkID: req.body.networkID}, (err, network)=>{
+    network.users.push(req.body.uid);
+    res.send("Updated!");
+  })
 });
 
 // Handling requests from Users
