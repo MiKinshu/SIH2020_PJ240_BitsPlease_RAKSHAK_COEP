@@ -3,10 +3,14 @@ package com.mikinshu.rakshak;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -20,8 +24,19 @@ import com.google.firebase.auth.FirebaseUserMetadata;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.Set;
+
+import io.chirp.chirpsdk.ChirpSDK;
+import io.chirp.chirpsdk.interfaces.ChirpEventListener;
+import io.chirp.chirpsdk.models.ChirpError;
+
+import static com.mikinshu.rakshak.NoNetworkActivity.CHIRP_APP_CONFIG;
+import static com.mikinshu.rakshak.NoNetworkActivity.CHIRP_APP_KEY;
+import static com.mikinshu.rakshak.NoNetworkActivity.CHIRP_APP_SECRET;
+import static com.mikinshu.rakshak.NoNetworkActivity.chirp;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     //runtime manipulation
     private static final int RC_SIGN_IN = 1;
     private static final int RC_USER_PREF_ACT = 24;
+    private static final int PERMISSION_ALL = 1;
+
     String TAG = "MyLogs";
 
     @Override
@@ -58,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
                             .setLogo(R.drawable.ic_namelogoblue)//Experiment with this.
                             .setAvailableProviders(Arrays.asList(
                                     new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                    new AuthUI.IdpConfig.EmailBuilder().build()))
+                                    new AuthUI.IdpConfig.EmailBuilder().build(),
+                                    new AuthUI.IdpConfig.PhoneBuilder().build()))
                             .build(),
                     RC_SIGN_IN);
         } else SetupApplication();
@@ -80,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivityForResult(intent, RC_USER_PREF_ACT);
                 } else {
                     Log.d(TAG, "onActivityResult: Existing user");
+                    MarkFirstTimeFalse();
                     SetupApplication();
                 }
             } else if (resultCode == RESULT_CANCELED) {
@@ -100,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "onActivityResult: EmergencyContact2 : " + EmergencyContact2);
                 Log.d(TAG, "onActivityResult: DOB : " + DOB);
                 PutUserDataToFirebase(Name, MedicalCondition, EmergencyContact1, EmergencyContact2, DOB);
+                AskPermissions();
                 MarkFirstTimeFalse();
                 SetupApplication();
             } else {
@@ -135,6 +155,41 @@ public class MainActivity extends AppCompatActivity {
     void SetupApplication() {
         //Application logic.
         Log.d(TAG, "SetupApplication: Called");
+        AskPermissions();
+        startService(new Intent(getApplicationContext(), Listener.class));
+
+        if(isNetworkAvailable()){
+            //set up the network features.
+        }
+        else {
+            Intent intent= new Intent(MainActivity.this,com.mikinshu.rakshak.NoNetworkActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    //These two methods are there to ask user permission.
+    void AskPermissions() {
+        String[] PERMISSIONS = {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.CALL_PHONE
+        };
+
+        if (!hasPermissions(this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        }
+    }
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private boolean isNetworkAvailable() {
