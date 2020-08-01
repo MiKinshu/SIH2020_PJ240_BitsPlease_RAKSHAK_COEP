@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.chirp.chirpsdk.ChirpSDK;
 import io.chirp.chirpsdk.interfaces.ChirpEventListener;
 import io.chirp.chirpsdk.models.ChirpError;
 import okhttp3.Call;
@@ -40,12 +41,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.mikinshu.rakshak.MainActivity.mUid;
 import static com.mikinshu.rakshak.NoNetworkActivity.chirp;
 
 public class Listener extends Service {
-    String TAG="MyLOGS";
-    Set<String> recieved;
+    String TAG = "MyLogs";
+    Set<String> Received = new HashSet<>();
     public static Map<String,String> PhDirectory = new HashMap<>();
 
     private static final int NOTIF_ID = 1;
@@ -58,12 +58,6 @@ public class Listener extends Service {
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind: ");
         // TODO: Return the communication channel to the service.
-//        ChirpError error = chirp.start(true, true);
-//        if (error.getCode() > 0) {
-//            Log.e("ChirpError: ", error.getMessage());
-//        } else {
-//            Log.v("ChirpSDK: ", "Started ChirpSDK");
-//        }
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -71,31 +65,23 @@ public class Listener extends Service {
     public int onStartCommand(Intent intent, int flags, int startId){
 
         Log.d(TAG, "onStartCommand: Adding numbers in database");
-
         PhDirectory.put("M","Medical");
         PhDirectory.put("F","Fire");
         PhDirectory.put("D","Disaster");
         PhDirectory.put("G","General Emergency");
 
-//        final Handler handler = new Handler();
-//        final int delay = 5000; //milliseconds
-
-        Log.d(TAG, "onStartCommand: ");
         ChirpError error = chirp.start(true, true);
         if (error.getCode() > 0) {
             Log.e("ChirpError: ", error.getMessage());
         } else {
-            Log.v(TAG, "Started ChirpSDK");
+            Log.v("ChirpSDK: ", "Started ChirpSDK");
         }
 
-//        handler.postDelayed(new Runnable(){
-//            public void run(){
-//                //do something
-//                recieved= new HashSet<>();
-//                handler.postDelayed(this, delay);
-//                Log.d(TAG, "run: variable reset");
-//            }
-//        }, delay);
+        if (error.getCode() == 0) {
+            Log.v("ChirpSDK: ", "Configured ChirpSDK");
+        } else {
+            Log.e("ChirpError: ", error.getMessage());
+        }
 
         ChirpEventListener chirpEventListener = new ChirpEventListener() {
             @Override
@@ -105,11 +91,11 @@ public class Listener extends Service {
                     Log.v(TAG, "Received " + identifier);
                     if(!isNetworkAvailable()) {
                         //sending w/o signal
-                        Log.d(TAG, "onReceived: identifier is "+identifier);
-//                        if(recieved.contains(identifier)){
-//                            Toast.makeText(Listener.this, "Repeated Receive, not forwarding", Toast.LENGTH_SHORT).show();
-//                        }
-//                        else {
+                        Log.d(TAG, "onReceived: identifier is "+ identifier);
+                        if(Received.contains(identifier)) {
+                            Toast.makeText(Listener.this, "Repeated Receive, not forwarding", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
                             Toast.makeText(Listener.this, "Network Unavailable, forwarding Audio. " + identifier, Toast.LENGTH_SHORT).show();
                             byte[] payload = identifier.getBytes(Charset.forName("UTF-8"));
                             ChirpError error = chirp.send(payload);
@@ -118,15 +104,15 @@ public class Listener extends Service {
                             } else {
                                 Log.v("ChirpSDK: ", "Sent " + identifier);
                             }
-//                        }
-//                        recieved.add(identifier);
+                        }
+                        Received.add(identifier);
                     }
                     else{
                         Toast.makeText(Listener.this, "Network Available, sending to Server.", Toast.LENGTH_SHORT).show();
-                        String type=PhDirectory.get(identifier.charAt(0)+"");
-                        String mlat=25.423+identifier.substring(1,3);
-                        String mLong=81.774+identifier.substring(4,6);
-//                        makeCall(type,mlat,mLong);
+                        String type = PhDirectory.get(identifier.charAt(0)+"");
+                        String mlat = 25.423 + identifier.substring(1,3);
+                        String mLong = 81.774 + identifier.substring(4,6);
+//                        makeCall(type, mlat, mLong); //This has to be changed once the server is running.
                     }
                 } else {
                     Log.e("ChirpError: ", "Decode failed");
@@ -182,18 +168,6 @@ public class Listener extends Service {
 //        }
     }
 
-    @Override
-    public void onRebind(Intent intent) {
-        // Start ChirpSDK sender and receiver, if no arguments are passed both sender and receiver are started
-        ChirpError error = chirp.start(true, true);
-        if (error.getCode() > 0) {
-            Log.e("ChirpError: ", error.getMessage());
-        } else {
-            Log.v("ChirpSDK: ", "Started ChirpSDK");
-        }
-        super.onRebind(intent);
-    }
-
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -201,13 +175,12 @@ public class Listener extends Service {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-//    @SuppressLint("MissingPermission")
 //    void makeCall(String type, String lat, String lon) {
 //        String url = getResources().getString(R.string.server) + "requests";
 //        RequestBody body = new FormBody.Builder()
 //                .add("uid", mUid)
 //                .add("loc", lat + " " + lon)
-//                .add("type", "fire")
+//                .add("type", type)
 //                .add("msg","")
 //                .build();
 //
@@ -217,23 +190,5 @@ public class Listener extends Service {
 //                .url(url)
 //                .post(body)
 //                .build();
-//        Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
-//
-//        String phoneNumber;
-//        if(type.equalsIgnoreCase("General Emergency"))
-//        {
-//            phoneNumber=getString(R.string.general_call);
-//        }
-//        else if(type.equalsIgnoreCase("Fire")){
-//            phoneNumber=getString(R.string.fire_call);
-//        }
-//        else if (type.equalsIgnoreCase("Medical")){
-//            phoneNumber=getString(R.string.medical_call);
-//        }
-//        else {
-//            phoneNumber=getString(R.string.disaster_call);
-//        }
-//        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
-//        startActivity(intent);
 //    }
 }

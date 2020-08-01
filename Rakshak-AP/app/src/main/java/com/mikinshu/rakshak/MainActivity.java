@@ -119,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "onActivityResult: EmergencyContact2 : " + EmergencyContact2);
                 Log.d(TAG, "onActivityResult: DOB : " + DOB);
                 PutUserDataToFirebase(Name, MedicalCondition, EmergencyContact1, EmergencyContact2, DOB);
-                AskPermissions();
                 MarkFirstTimeFalse();
                 SetupApplication();
             } else {
@@ -156,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         //Application logic.
         Log.d(TAG, "SetupApplication: Called");
         AskPermissions();
+        SetUpChirp();
         startService(new Intent(getApplicationContext(), Listener.class));
 
         if(isNetworkAvailable()){
@@ -164,6 +164,17 @@ public class MainActivity extends AppCompatActivity {
         else {
             Intent intent= new Intent(MainActivity.this,com.mikinshu.rakshak.NoNetworkActivity.class);
             startActivity(intent);
+        }
+    }
+
+    void SetUpChirp()
+    {
+        chirp = new ChirpSDK(this, CHIRP_APP_KEY, CHIRP_APP_SECRET);
+        ChirpError error = chirp.setConfig(CHIRP_APP_CONFIG);
+        if (error.getCode() == 0) {
+            Log.v("ChirpSDK: ", "Configured ChirpSDK");
+        } else {
+            Log.e("ChirpError: ", error.getMessage());
         }
     }
 

@@ -43,9 +43,9 @@ public class CustomDialogClass extends Dialog implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.custom_dialogue);
-        go=(Button)findViewById(R.id.BTNgo);
-        spinnerdialogue=findViewById(R.id.spinner2);
-        String[] spinnerEmergencylist = {"General Emergency", "Medical", "Fire","Disaster"};
+        go = (Button) findViewById(R.id.BTNgo);
+        spinnerdialogue = findViewById(R.id.spinner2);
+        String[] spinnerEmergencylist = {"General Emergency", "Medical", "Fire", "Disaster"};
         ArrayAdapter<String> spinnerEmergencyAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, spinnerEmergencylist);
         spinnerEmergencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerdialogue.setAdapter(spinnerEmergencyAdapter);
@@ -53,14 +53,8 @@ public class CustomDialogClass extends Dialog implements View.OnClickListener {
         spinnerdialogue.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (parent.getItemAtPosition(position).toString().equals("General Emergency")){
-//                    Toast.makeText(InNetwork.this, "General Emergency selected", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Log.d(TAG, "onItemSelected: in else");
-                    Toast.makeText(c, parent.getItemAtPosition(position).toString()+" selected.", Toast.LENGTH_SHORT).show();
-                    value=parent.getItemAtPosition(position).toString();
-                }
+                Toast.makeText(c, parent.getItemAtPosition(position).toString() + " selected.", Toast.LENGTH_SHORT).show();
+                value = parent.getItemAtPosition(position).toString();
             }
 
             @Override
@@ -73,21 +67,16 @@ public class CustomDialogClass extends Dialog implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.BTNgo:
-                Toast.makeText(c, "Go clicked", Toast.LENGTH_SHORT).show();
-                makeNoNetCall(value);
-                break;
-            default:
-                break;
+        if (v.getId() == R.id.BTNgo) {
+            makeNoNetCall(value);
         }
         dismiss();
     }
 
-    void makeNoNetCall(String Emergency){
-//        String identifier = Emergency.charAt(0) + mLat.substring(6,9) + mLon.substring(6,9);
+    void makeNoNetCall(String Emergency) {
+//        String identifier = Emergency.charAt(0) + mLat.substring(6,9) + mLon.substring(6,9); //This is creating NULL Pointer Exception.
         String identifier = "Test1";
-        Log.d(TAG, "makeNoNetCall: Indentifier is "+identifier);
+        Log.d(TAG, "makeNoNetCall: Indentifier is " + identifier);
         byte[] payload = identifier.getBytes(Charset.forName("UTF-8"));
         ChirpError error = chirp.send(payload);
         if (error.getCode() > 0) {
