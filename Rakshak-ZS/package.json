@@ -1,0 +1,14 @@
+{
+  "name": "rakshak-zs",
+  "version": "1.0.0",
+  "description": "The Zonal server for Rakshak",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "abhiandthetruth",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
