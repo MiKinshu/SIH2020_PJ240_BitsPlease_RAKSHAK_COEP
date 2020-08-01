@@ -47,6 +47,7 @@ app.get("/login", (req, res) => {
     res.render("login");
 });
 
+
 app.get("/home", (req, res) => {
     var request = require("request");
     var token = req.cookies.auth;
@@ -123,6 +124,10 @@ app.post("/login", (req, res) => {
             }
         }
     );
+});
+
+app.get("/", (req, res) => {
+    res.render("login");
 });
 
 // Middlewares and errors
