@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const admin = require("./firebase");
 const mongoose = require("mongoose");
 const Report = require("./Report");
-const Network = require("./network/network")
 
 //Initializing the app
 const app = express();
@@ -22,6 +21,7 @@ mongoose.connect("mongodb+srv://test:test@cluster0-vi5m5.mongodb.net/test?retryW
   useUnifiedTopology: true,
   useNewUrlParser: true
 });
+const Network = mongoose.model("Network");
 
 //Getting the Users db
 const Users = admin.database().ref("users");
@@ -61,13 +61,42 @@ app.get("/reports", (req, res)=>{
     });
 });
 
+app.get("/network", (req, res)=>{
+  Network.find({}, function(err, reports){
+      console.log(reports);
+      res.send(reports);
+  });
+});
+
 //route to register on a network
 app.post("/usenetwork", (req, res)=>{
   console.log(req.body);
-  Network.findOne({networkID: req.body.networkID}, (err, network)=>{
+  Network.findOne({networkId: req.body.networkId}, (err, network)=>{
     network.users.push(req.body.uid);
     res.send("Updated!");
   })
+});
+
+// Network Server Raisng an alert, sends everyone in the network a notification
+app.post("/raiseAlert", function (req, res){
+  console.log(req.body);
+  Network.findOne({networkId: req.body.networkId}, (err, network)=>{
+  const userstoSend = network.users;
+  // firebaseUsers.on("value", function(snapshot) {
+  //   let tokens = snapshot.val();
+  //   Object.keys(tokens).forEach(function(key) {
+  //     //Decide whether the current key is viable for sending the message
+  //       if (userstoSend.includes(key) && isViable(key) && tokens[key]!=='ABCD'){
+  //       //console.log(tokens[key]);
+  //       message(tokens[key], "18 71", "general", req.body.info);
+  //       } 
+  //   });
+  //   }, function (errorObject) {
+  //     console.log("The read failed: " + errorObject.code);
+  //   });
+  console.log(userstoSend);
+    res.redirect("home?alert=true");
+  });
 });
 
 // Handling requests from Users
@@ -80,7 +109,7 @@ app.post("/requests", (req, res)=>{
             uid: req.body.uid,
             msg: req.body.msg,
             loc: req.body.loc,
-            networkID: record.networkID,
+            networkId: record.networkId,
             name: record.displayName,
             phone: record.phoneNumber
         },
