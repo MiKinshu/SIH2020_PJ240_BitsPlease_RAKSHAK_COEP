@@ -95,7 +95,7 @@ app.post("/raiseAlert", function (req, res){
   //     console.log("The read failed: " + errorObject.code);
   //   });
   console.log(userstoSend);
-    res.redirect("home?alert=true");
+    res.redirect("https://rakshak-local.herokuapp.com/home?alert=true");
   });
 });
 
