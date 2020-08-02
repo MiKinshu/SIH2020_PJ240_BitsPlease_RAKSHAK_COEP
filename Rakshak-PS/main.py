@@ -32,7 +32,7 @@ def predict(military_time, lat, longitude, age, gender) -> float:
     extreme_danger_score = proximity_score * prediction
     extreme_safety_score = 1 - extreme_danger_score
 
-    return round(encoding.score_fencing(extreme_safety_score), 2)
+    return str(round(encoding.score_fencing(extreme_safety_score), 2))
 
 
 # run it directly via python3 main.py
