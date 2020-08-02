@@ -27,16 +27,17 @@ const Network = mongoose.model("Network");
 const Users = admin.database().ref("Users");
 
 //Function for sending notifications
-const message = (registrationToken, reportID, location, type, msg) => {
+const message = (registrationToken, location, type, msg, reportID) => {
     var message = {
       data: {
-        reportID,
+        reportID: reportID,
         loc : location,
         type: type,
         msg: msg
       },
       token: registrationToken
     };
+    console.log(message);
     admin.messaging().send(message)
       .then((response) => {
         console.log('Successfully sent message:' + registrationToken, response);
@@ -85,19 +86,18 @@ app.post("/raiseAlert", function (req, res){
   console.log(req.body);
   Network.findOne({networkId: req.body.networkId}, (err, network)=>{
   const userstoSend = network.users;
-  // firebaseUsers.on("value", function(snapshot) {
-  //   let tokens = snapshot.val();
-  //   Object.keys(tokens).forEach(function(key) {
-  //     //Decide whether the current key is viable for sending the message
-  //       if (userstoSend.includes(key) && isViable(key) && tokens[key]!=='ABCD'){
-  //       //console.log(tokens[key]);
-  //       message(tokens[key], "18 71", "general", req.body.info);
-  //       } 
-  //   });
-  //   }, function (errorObject) {
-  //     console.log("The read failed: " + errorObject.code);
-  //   });
-  console.log(userstoSend);
+  Users.on("value", function(snapshot) {
+    let tokens = snapshot.val();
+    Object.keys(tokens).forEach(function(key) {
+      //Decide whether the current key is viable for sending the message
+        if (userstoSend.includes(key)){
+          //console.log(tokens[key]);
+          message(tokens[key].Token, "18 71", "general", req.body.info, "");
+        } 
+    });
+    }, function (errorObject) {
+      console.log("The read failed: " + errorObject.code);
+    });
     res.redirect("https://rakshak-local.herokuapp.com/home?alert=true");
   });
 });
@@ -125,19 +125,19 @@ app.post("/requests", (req, res)=>{
             }
             else{
                 console.log(report);
-                // //getting all the registrationTokens and sending the notification
-                // Users.on("value", function(snapshot) {
-                //     let tokens = snapshot.val();
-                //     Object.keys(tokens).forEach(function(key) {
-                //     //Decide whether the current key is viable for sending the message
-                //     if (key!==uid && isViable(key)){
-                //         //console.log(tokens[key]);
-                //         message(tokens[key], req.body.loc, req.body.type, req.body.msg);
-                //     }
-                //     });
-                // }, function (errorObject) {
-                //     console.log("The read failed: " + errorObject.code);
-                // });
+                //getting all the registrationTokens and sending the notification
+                Users.on("value", function(snapshot) {
+                    let tokens = snapshot.val();
+                    Object.keys(tokens).forEach(function(key) {
+                      //Decide whether the current key is viable for sending the message
+                      if (key!==uid){
+                          console.log(tokens[key]);
+                          message(tokens[key].Token, req.body.loc, req.body.type, req.body.msg, JSON.stringify(report._id));
+                      }
+                    });
+                }, function (errorObject) {
+                    console.log("The read failed: " + errorObject.code);
+                });
                 res.send("Yes!");
             }
           });
