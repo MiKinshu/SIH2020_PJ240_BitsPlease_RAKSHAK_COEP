@@ -66,16 +66,18 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String lat ="-1",lon = "-1";
         try {
             String[] location = Objects.requireNonNull(remoteMessage.getData().get("loc")).split(" ", 2);
-
-            if (location.length > 2)
-                distance = getDistanceFromEmergency(location[0], location[1]);
+            Log.d("location", location[0]+" "+location[1]);
+//            if (location.length > 2)
+//                distance = getDistanceFromEmergency(location[0], location[1]);
             message = message + "\nEmergency received at distance = " + distance + " KM";
-            dis = String.valueOf(distance).substring(0, 5);
+            //dis = String.valueOf(distance);
+            lat = location[0];
+            lon = location[1];
         }
         catch (Exception e){
             Log.w("Exception caught in calculating distance from emergency ", e.toString());
         }
-        showNotification(FirebaseMessagingService.this, title + " (" +dis + " KM)", message,lat,lon);
+        showNotification(FirebaseMessagingService.this, title, message,lat,lon);
         Log.d(TAG, "Message=" + message);
         super.onMessageReceived(remoteMessage);
     }
@@ -96,6 +98,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         dist = Math.acos(dist);
         dist = rad2deg(dist);
         dist = dist * 60 * 1.1515;
+        Log.d("Distance: ", " "+dist);
         return (dist);
     }
 
@@ -110,12 +113,13 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     public void showNotification(Context context, String title, String body,String lat,String lon) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        int notificationId = 1;
+        int notificationId = (int)System.currentTimeMillis();;
         String channelId = "channel-01";
         String channelName = "Channel Name";
         int importance = NotificationManager.IMPORTANCE_HIGH;
 
-        Uri gmmIntentUri = Uri.parse("geo:" + lat + "," + lon + "?z=15");
+        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + lat + "," + lon);
+        Log.d("URI", ""+gmmIntentUri);
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         mapIntent.setPackage("com.google.android.apps.maps");
 //        mapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import io.chirp.chirpsdk.ChirpSDK;
 import io.chirp.chirpsdk.interfaces.ChirpEventListener;
@@ -226,6 +227,11 @@ public class MainActivity extends AppCompatActivity {
         if(isNetworkAvailable()){
             //set up the network features.
             client = new OkHttpClient();
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.connectTimeout(30, TimeUnit.SECONDS);
+            builder.readTimeout(30, TimeUnit.SECONDS);
+            builder.writeTimeout(30, TimeUnit.SECONDS);
+            client = builder.build();
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
             getloc();
             spinner = findViewById(R.id.spinner);
@@ -298,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             RequestBody body = new FormBody.Builder()
                                     .add("uid", mUid)
-                                    .add("key", input.getText().toString())
+                                    .add("networkId", input.getText().toString())
                                     .build();
                             Request request = new Request.Builder()
                                     .url(getResources().getString(R.string.server) + "usenetwork")
