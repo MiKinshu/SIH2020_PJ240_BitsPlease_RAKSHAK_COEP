@@ -3,6 +3,7 @@ package com.mikinshu.rakshak;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ public class UserOrientationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_orientation);
         btnConfirm = findViewById(R.id.btnConfirm);
+        btnConfirm.setBackgroundColor(Color.parseColor("#247BA0"));
         final EditText etname = findViewById(R.id.editTextNumber2), etaadhaar = findViewById(R.id.editTextNumber4), etMedCon = findViewById(R.id.editTextNumber);
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
