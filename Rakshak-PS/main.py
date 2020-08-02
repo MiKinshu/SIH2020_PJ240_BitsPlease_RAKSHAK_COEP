@@ -28,7 +28,9 @@ def predict(military_time, lat, longitude, age, gender) -> float:
     prediction = model.predict(np.asarray([int(age), int(gender), sin_time, cos_time]).reshape(1, -1))
    
     # return multiplication
-    return str(proximity_score * prediction)
+    # This returns a "safety score".
+    # convert to a percentage if necessary by multiplying with 100
+    return str(1 - (proximity_score * prediction))
 
 
 # run it directly via python3 main.py
