@@ -34,8 +34,8 @@ def predict(military_time, lat, longitude, age, gender) -> float:
     extreme_safety_score = 1 - extreme_danger_score
 
     # mocking result for now
-    # return str(100 * round(random.random(), 2))
-    return(str(round(encoding.score_fencing(extreme_danger_score))))
+    # return(str(round(encoding.score_fencing(extreme_danger_score))))
+    return str(round(random.uniform(5, 15), 2))
 
 
 # run it directly via python3 main.py
