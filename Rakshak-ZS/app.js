@@ -118,7 +118,7 @@ app.post("/requests", (req, res) => {
                     msg: req.body.msg,
                     loc: req.body.loc,
                     networkId: snapshot.val()[uid].NetworkID,
-                    name: record.displayName,
+                    name: snapshot.val()[uid].Name,
                     phone: record.phoneNumber
                 },
                 (err, report) => {

@@ -113,13 +113,10 @@ public class MainActivity extends AppCompatActivity {
                             .setIsSmartLockEnabled(false)
                             .setLogo(R.drawable.ic_namelogoblue)//Experiment with this.
                             .setAvailableProviders(Arrays.asList(
-                                    new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                    new AuthUI.IdpConfig.EmailBuilder().build(),
                                     new AuthUI.IdpConfig.PhoneBuilder().build()))
                             .build(),
                     RC_SIGN_IN);
-        } else
-        {
+        } else {
             SetupApplication();
         }
     }
@@ -149,21 +146,24 @@ public class MainActivity extends AppCompatActivity {
             }
         } else if (requestCode == RC_USER_PREF_ACT) {
             if (resultCode == RESULT_OK) {
-                String Name, MedicalCondition, EmergencyContact1, EmergencyContact2, DOB;
+                String Name, MedicalCondition, EmergencyContact1, EmergencyContact2, DOB, AADHAAR;
                 Name = data.getStringExtra("Name");
                 MedicalCondition = data.getStringExtra("MedicalCondition");
                 EmergencyContact1 = data.getStringExtra("EmergencyContact1");
                 EmergencyContact2 = data.getStringExtra("EmergencyContact2");
+                AADHAAR = data.getStringExtra("AADHAAR");
                 DOB = data.getStringExtra("DOB");
                 Log.d(TAG, "onActivityResult: Name : " + Name);
                 Log.d(TAG, "onActivityResult: MedicalCondition : " + MedicalCondition);
                 Log.d(TAG, "onActivityResult: EmergencyContact1 : " + EmergencyContact1);
                 Log.d(TAG, "onActivityResult: EmergencyContact2 : " + EmergencyContact2);
                 Log.d(TAG, "onActivityResult: DOB : " + DOB);
-                PutUserDataToFirebase(Name, MedicalCondition, EmergencyContact1, EmergencyContact2, DOB);
+                PutUserDataToFirebase(Name, MedicalCondition, EmergencyContact1, EmergencyContact2, DOB, AADHAAR);
                 MarkFirstTimeFalse();
                 SetupApplication();
             } else {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                user.delete();
                 Toast.makeText(this, "Cannot work, until you provide info.", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Send user data to Firebase.
-    void PutUserDataToFirebase(String Name, String MedicalCondition, String EmergencyContact1, String EmergencyContact2, String DOB) {
+    void PutUserDataToFirebase(String Name, String MedicalCondition, String EmergencyContact1, String EmergencyContact2, String DOB, String AADHAAR) {
         Log.d(TAG, "PutUserDataToFirebase: Called");
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -187,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
             mUsersDatabaseReference.child("EmergencyContact2").setValue(EmergencyContact2);
             mUsersDatabaseReference.child("DOB").setValue(DOB);
             mUsersDatabaseReference.child("NetworkID").setValue("IIITA");
+            mUsersDatabaseReference.child("AADHAAR").setValue(AADHAAR);
         } else Log.d(TAG, "PutUserDataToFirebase: FireBase Error - Cannot find logged in user.");
     }
 
@@ -374,6 +375,10 @@ public class MainActivity extends AppCompatActivity {
                     makeCall(Emergency);
                 }
             });
+        }
+        else{
+            Intent intent = new Intent(MainActivity.this, NoNetworkActivity.class);
+            startActivity(intent);
         }
     }
 
