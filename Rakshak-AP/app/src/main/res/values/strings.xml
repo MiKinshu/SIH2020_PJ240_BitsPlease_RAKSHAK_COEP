@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Rakshak</string>
+    <string name="server">http://192.168.43.30:3001/</string>
     <string name="error_missing_permissions">Cannot start without required permissions</string>
     <string name="toast_connected">Connected to %s</string>
     <string name="toast_disconnected">Disconnected from %s</string>

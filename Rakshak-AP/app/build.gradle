@@ -38,14 +38,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:19.3.2'
     implementation 'com.firebaseui:firebase-ui-auth:6.2.0'
     implementation 'com.google.firebase:firebase-database:19.3.1'
-    implementation 'com.google.firebase:firebase-messaging:20.1.0'
+    implementation 'com.google.firebase:firebase-messaging:20.2.4'
 
     //chirp
     implementation "io.chirp:chirpsdk:3.10.+"
 
     //location
     implementation 'com.google.android.gms:play-services-location:17.0.0'
-    implementation 'com.google.android.gms:play-services-nearby:16.0.0'
+    implementation 'com.google.android.gms:play-services-nearby:17.0.0'
 }
 
 repositories {

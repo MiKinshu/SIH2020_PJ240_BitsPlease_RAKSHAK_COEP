@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg1"
-    tools:context="com.mikinshu.rakshak.WalkiTalkie">
+    tools:context=".WalkiTalkie">
 
     <Button
         android:id="@+id/starter"
