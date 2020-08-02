@@ -108,7 +108,7 @@
                 </form>
               </div>
             </li>
-
+           
             <!-- Nav Item - Alerts -->
             <li class="nav-item dropdown no-arrow mx-1">
               <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -136,7 +136,7 @@
                 <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
               </div>
             </li>
-
+       
             <!-- Nav Item - Messages -->
             <li class="nav-item dropdown no-arrow mx-1">
               <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -169,7 +169,7 @@
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{officeName}}</span>
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{office.officeName}}</span>
                 <img class="img-profile rounded-circle" src="https://source.unsplash.com/random/60x60">
               </a>
               <!-- Dropdown - User Information -->
@@ -286,9 +286,38 @@
               </div>
             </div>
           </div>
-
+            {{#each reports}}
       <!-- End of Main Content -->
-
+               <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Emergency reported in {{this.networkId}}</h6>
+                </div>
+                <div class="card-body">
+                <p>
+                  Reported By: <b>{{this.name}}</b>    <br> Phone: <b>{{this.phone}}</b> 
+                   <br>
+                  Date: <b>{{this.date}}</b> 
+                  <br>
+                  Location: <b><a href="https://www.google.co.uk/maps?q={{this.loc}}">Go to location</a> </b>
+                  <br>
+                {{#ifequal "completed" this.status }}
+                  Officer Messege: <b>I will fix this! </b>
+                  {{/ifequal}}
+                  </p>
+                   <a href="/report/assign/id={{this._id}}" class="btn btn-success btn-icon-split btn-sm">
+                    <span class="icon text-white-50">
+                      <i class="fas fa-flag"></i>
+                    </span>
+                    <span class="text">Assign Emergency</span>
+                  </a>
+                   <br><br>
+                  <h4 class="small font-weight-bold">Emergency {{this.status}}! <span class="float-right"> {{this.status}}!</span></h4>
+                  <div class="progress">
+                    <div class="progress-bar bg-{{#ifequal "created" this.status }}danger{{/ifequal}}{{#ifequal "assigned" this.status }}warning{{/ifequal}}{{#ifequal "started" this.status }}success{{/ifequal}}{{#ifequal "completed" this.status }}success{{/ifequal}}" role="progressbar" style="width:{{#ifequal "created" this.status }} 20% {{/ifequal}} {{#ifequal "assigned" this.status }} 40% {{/ifequal}} {{#ifequal "started" this.status }} 60% {{/ifequal}} {{#ifequal "completed" this.status }} 100% {{/ifequal}}" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+              </div>
+             {{/each}}
       <!-- Footer -->
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
