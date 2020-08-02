@@ -18,3 +18,8 @@ age,gender,sin_time,cos_time,intensity
 19,0,0.6080663930444475,0.7938861767595626,0.8547215083120775
 """
 FINAL_DATASET = "datasets/dataset_v4_with_intensity.csv"
+
+# This file contains a list of all locations where an emergency occurred
+# Since it only contains locations, we can assume that this doesn't cause any privacy issues
+# We will use this to calculate the proximity of a user to danger locations
+LOCATIONS_CSV = "datasets/lat_long_only.csv"
