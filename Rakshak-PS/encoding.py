@@ -30,6 +30,6 @@ def military_time_in_minutes_fn(military_time: str) -> int:
 
 def score_fencing(score: float) -> float:
     while (score in [0.0, 1.0]):
-        score = max(0, min(1, 1 - random.normalvariate(score, 0.05)))
+        score = max(0, min(1, score + ((0.5 - score) * random.normalvariate(0, 1))))
 
     return score
