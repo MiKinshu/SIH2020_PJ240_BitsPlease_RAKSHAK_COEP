@@ -80,10 +80,14 @@ router.get("/assign/:reportId", (req, res)=>{
         }
         report.status = "assigned";
         report.officerId = "prateek123";
+        const dummyOfficers = ["Manthan", "Prateek", "Ritik", "Mrigyen"];
+        const dummyNumbers = ["7776789899", "7776744499", "9876789899", "6616789899"];
+        const k = Math.floor(Math.random() * 4);
+        report.officerName = dummyOfficers[k];
         report.save((err) => {
             if (err) res.send("Something went wrong");
             console.log("done")
-            res.redirect("http://localhost:3000/home");
+            res.redirect("https://rakshak-es.herokuapp.com/home");
         });
     })
 })

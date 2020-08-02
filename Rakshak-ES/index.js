@@ -74,7 +74,7 @@ app.get("/home", (req, res) => {
         alert = true;
     }
     request.post(
-        "http://localhost:3001/office/me", {
+        "https://rakshak-zs.herokuapp.com/office/me", {
             json: { accessToken: token }
         },
         function(error, response, body) {
@@ -116,7 +116,7 @@ app.post("/register", (req, res) => {
     var request = require("request");
     console.log(req.body);
     request.post(
-        "http://localhost:3001/office/register", {
+        "https://rakshak-zs.herokuapp.com/office/register", {
             json: {
                 name: req.body.name,
                 password: req.body.password,
@@ -145,7 +145,7 @@ app.post("/login", (req, res) => {
     var request = require("request");
     console.log(req.body);
     request.post(
-        "http://localhost:3001/office/login", {
+        "https://rakshak-zs.herokuapp.com/office/login", {
             json: {
 
                 password: req.body.password,
