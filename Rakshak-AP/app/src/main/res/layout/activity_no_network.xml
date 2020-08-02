@@ -21,13 +21,14 @@
 
     <Button
         android:id="@+id/BTNemergencyMSG"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/nonwrkbtn1"
+        android:onClick="handleWalkieTalkie"
         app:layout_constraintBottom_toTopOf="@+id/BTNwalkietalkie"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        style="?android:attr/borderlessButtonStyle"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/BTNwalkietalkie"

@@ -197,7 +197,7 @@ public class WalkiTalkie extends ConnectionsActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
+        Log.d("here", "here");
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mOriginalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
