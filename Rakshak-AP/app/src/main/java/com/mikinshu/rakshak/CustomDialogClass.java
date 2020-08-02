@@ -82,6 +82,7 @@ public class CustomDialogClass extends Dialog implements View.OnClickListener {
         if (error.getCode() > 0) {
             Log.e("ChirpError: ", error.getMessage());
         } else {
+            Toast.makeText(c, "Sending ultrasound message", Toast.LENGTH_SHORT).show();
             Log.v("ChirpSDK: ", "Sent " + identifier);
         }
     }
