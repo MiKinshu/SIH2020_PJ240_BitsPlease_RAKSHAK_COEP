@@ -76,7 +76,7 @@ public class WalkiTalkie extends ConnectionsActivity {
 
 
     private static final String SERVICE_ID =
-            "com.google.location.nearby.apps.walkietalkie.automatic.SERVICE_ID";
+            "com.mikinshu.rakshak.walkietalkie.automatic.SERVICE_ID";
 
 
     private State mState = State.UNKNOWN;

@@ -240,57 +240,19 @@ public class MainActivity extends AppCompatActivity {
             BTNInNetCommunity = findViewById(R.id.BTNInNetCommunity);
             BTNInNetPredictor = findViewById(R.id.BTNInNetPredictor);
             BTNInNetPredictor.setOnClickListener(new View.OnClickListener() {
+
                 @Override
                 public void onClick(View v) {
-                    try {
-                        final String currentTime = Calendar.getInstance().getTime().toString().split(" ")[3];
-                        RequestBody body = new FormBody.Builder()
-                                .add("military_time", currentTime.substring(0, currentTime.lastIndexOf(':')))
-                                .add("lat", mLat)
-                                .add("long", mLon)
-                                .add("age", "25")
-                                .add("gender", "female")
-                                .build();
-
-                        Request request = new Request.Builder()
-                                .url(getResources().getString(R.string.server) + "predict")
-                                .post(body)
-                                .build();
-
-                        client.newCall(request).enqueue(new Callback() {
-
-                            @Override
-                            public void onResponse(@NotNull Call call, @NotNull final Response response){
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        MainActivity.this.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Toast.makeText(getApplicationContext(), response.body().string(), Toast.LENGTH_SHORT).show();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                    } catch (Exception e) {
-                        Log.d(TAG, "Location is Null " + e);
-                    }
-
                     Intent intent = new Intent(MainActivity.this, SearchSafety.class);
                     startActivity(intent);
+
+
+
+//                    Intent intent = new Intent(MainActivity.this, SearchSafety.class);
+//                    startActivity(intent);
                 }
             });
+
             BTNInNetCommunity.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -381,7 +343,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
-
+    void openSafety(String res){
+    }
     //Getting location of user.
     @SuppressLint("MissingPermission")
     protected void getloc() {
