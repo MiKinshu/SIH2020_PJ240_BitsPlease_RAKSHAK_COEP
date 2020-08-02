@@ -300,17 +300,20 @@
                   <br>
                   Location: <b><a href="https://www.google.co.uk/maps?q={{this.loc}}">Go to location</a> </b>
                   <br>
-                {{#ifequal "completed" this.status }}
+                  {{#ifnequal '' this.msg }}
                   Officer Messege: <b>I will fix this! </b>
-                  {{/ifequal}}
+                  {{/ifnequal}}
                   </p>
+                  {{#ifequal "created" this.status }}
                    <a href="http://localhost:3001/office/assign/{{this._id}}" class="btn btn-success btn-icon-split btn-sm">
                     <span class="icon text-white-50">
                       <i class="fas fa-flag"></i>
                     </span>
                     <span class="text">Assign Emergency</span>
                   </a>
+                  
                    <br><br>
+                   {{/ifequal}}
                   <h4 class="small font-weight-bold">Emergency {{this.status}}! <span class="float-right"> {{this.status}}!</span></h4>
                   <div class="progress">
                     <div class="progress-bar bg-{{#ifequal "created" this.status }}danger{{/ifequal}}{{#ifequal "assigned" this.status }}warning{{/ifequal}}{{#ifequal "started" this.status }}success{{/ifequal}}{{#ifequal "completed" this.status }}success{{/ifequal}}" role="progressbar" style="width:{{#ifequal "created" this.status }} 20% {{/ifequal}} {{#ifequal "assigned" this.status }} 40% {{/ifequal}} {{#ifequal "started" this.status }} 60% {{/ifequal}} {{#ifequal "completed" this.status }} 100% {{/ifequal}}" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
