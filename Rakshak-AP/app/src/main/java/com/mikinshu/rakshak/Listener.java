@@ -64,7 +64,6 @@ public class Listener extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
 
-        Log.d(TAG, "onStartCommand: Adding numbers in database");
         PhDirectory.put("M","Medical");
         PhDirectory.put("F","Fire");
         PhDirectory.put("D","Disaster");
@@ -112,7 +111,7 @@ public class Listener extends Service {
                         String type = PhDirectory.get(identifier.charAt(0)+"");
                         String mlat = 25.423 + identifier.substring(1,3);
                         String mLong = 81.774 + identifier.substring(4,6);
-//                        makeCall(type, mlat, mLong); //This has to be changed once the server is running.
+                        makeCall(type, mlat, mLong); //This has to be changed once the server is running.
                     }
                 } else {
                     Log.e("ChirpError: ", "Decode failed");
@@ -160,12 +159,6 @@ public class Listener extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-//        ChirpError error = chirp.start(true, true);
-//        if (error.getCode() > 0) {
-//            Log.e("ChirpError: ", error.getMessage());
-//        } else {
-//            Log.v("ChirpSDK: ", "Started ChirpSDK");
-//        }
     }
 
     private boolean isNetworkAvailable() {
@@ -175,20 +168,20 @@ public class Listener extends Service {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-//    void makeCall(String type, String lat, String lon) {
-//        String url = getResources().getString(R.string.server) + "requests";
-//        RequestBody body = new FormBody.Builder()
-//                .add("uid", mUid)
-//                .add("loc", lat + " " + lon)
-//                .add("type", type)
-//                .add("msg","")
-//                .build();
-//
-//        OkHttpClient client = new OkHttpClient();
-//
-//        Request request = new Request.Builder()
-//                .url(url)
-//                .post(body)
-//                .build();
-//    }
+    void makeCall(String type, String lat, String lon) {
+        String url = getResources().getString(R.string.server) + "requests";
+        RequestBody body = new FormBody.Builder()
+                .add("uid", "dum_UID") //This has to be checked.
+                .add("loc", lat + " " + lon)
+                .add("type", type)
+                .add("msg","")
+                .build();
+
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+    }
 }

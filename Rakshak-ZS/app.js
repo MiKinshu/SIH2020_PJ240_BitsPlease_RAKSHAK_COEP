@@ -24,7 +24,7 @@ mongoose.connect("mongodb+srv://test:test@cluster0-vi5m5.mongodb.net/test?retryW
 const Network = mongoose.model("Network");
 
 //Getting the Users db
-const Users = admin.database().ref("users");
+const Users = admin.database().ref("Users");
 
 //Function for sending notifications
 const message = (registrationToken, reportID, location, type, msg) => {
@@ -73,7 +73,10 @@ app.post("/usenetwork", (req, res)=>{
   console.log(req.body);
   Network.findOne({networkId: req.body.networkId}, (err, network)=>{
     network.users.push(req.body.uid);
-    res.send("Updated!");
+    network.save((err)=>{
+      if(err) res.send("Something went wrong");
+      res.send("Updated!");
+    })
   })
 });
 
@@ -105,11 +108,13 @@ app.post("/requests", (req, res)=>{
     const uid = req.body.uid;
     admin.auth().getUser(uid).then((record)=>{
         console.log(record);
-        Report.create({
+        Users.on("value", (snapshot)=>{
+          console.log(snapshot.val()[uid]);
+          Report.create({
             uid: req.body.uid,
             msg: req.body.msg,
             loc: req.body.loc,
-            networkId: record.networkId,
+            networkId: snapshot.val()[uid].NetworkID,
             name: record.displayName,
             phone: record.phoneNumber
         },
@@ -119,7 +124,7 @@ app.post("/requests", (req, res)=>{
                 res.status(500).send("Server Problem in Creating Report");
             }
             else{
-                console.log(report._id);
+                console.log(report);
                 // //getting all the registrationTokens and sending the notification
                 // Users.on("value", function(snapshot) {
                 //     let tokens = snapshot.val();
@@ -136,6 +141,7 @@ app.post("/requests", (req, res)=>{
                 res.send("Yes!");
             }
           });
+        });
     });
 })
 

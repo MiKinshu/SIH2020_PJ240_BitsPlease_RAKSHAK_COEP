@@ -47,7 +47,7 @@ router.post("/setUrl",  function(req, res, next){
     console.log(network);
   });
 });
-
+ 
 router.post("/:networkId/requests", VerifyToken, function(req, res, next){
   report.find({networkId : req.params.networkId}, function(err, reports){
     console.log(req.params.networkId);
