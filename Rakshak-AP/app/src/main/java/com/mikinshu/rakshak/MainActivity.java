@@ -129,17 +129,17 @@ public class MainActivity extends AppCompatActivity {
                 //User Signed-In
                 Log.d(TAG, "onActivityResult: User logged in");
                 mFirebaseAuth = FirebaseAuth.getInstance();
-                FirebaseUserMetadata metadata = mFirebaseAuth.getCurrentUser().getMetadata();
-                if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) { //user signing for the first time.
+//                FirebaseUserMetadata metadata = mFirebaseAuth.getCurrentUser().getMetadata();
+//                if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) { //user signing for the first time.
                     //open user orientation activity.
                     Log.d(TAG, "onActivityResult: user logged in for the first time");
                     Intent intent = new Intent(MainActivity.this, com.mikinshu.rakshak.UserOrientationActivity.class);
                     startActivityForResult(intent, RC_USER_PREF_ACT);
-                } else {
-                    Log.d(TAG, "onActivityResult: Existing user");
-                    MarkFirstTimeFalse();
-                    SetupApplication();
-                }
+//                } else {
+//                    Log.d(TAG, "onActivityResult: Existing user");
+//                    MarkFirstTimeFalse();
+//                    SetupApplication();
+//                }
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Cannot work, until you sign in.", Toast.LENGTH_SHORT).show();
                 finish();
@@ -510,5 +510,11 @@ public class MainActivity extends AppCompatActivity {
         }
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        MainActivity.this.finish();
     }
 }
