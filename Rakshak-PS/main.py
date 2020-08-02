@@ -25,12 +25,14 @@ def predict(military_time, lat, longitude, age, gender) -> float:
     # get prediction of emergency
     sin_time = encoding.sin_time(encoding.military_time_in_minutes_fn(military_time))
     cos_time = encoding.cos_time(encoding.military_time_in_minutes_fn(military_time))
-    prediction = model.predict(np.asarray([int(age), int(gender), sin_time, cos_time]).reshape(1, -1))
-   
-    # return multiplication
+    prediction = model.predict(
+        np.asarray([int(age), int(gender), sin_time, cos_time]).reshape(1, -1))
     # This returns a "safety score".
     # convert to a percentage if necessary by multiplying with 100
-    return str(1 - (proximity_score * prediction))
+    extreme_danger_score = proximity_score * prediction
+    extreme_safety_score = 1 - extreme_danger_score
+
+    return round(encoding.score_fencing(extreme_safety_score), 2)
 
 
 # run it directly via python3 main.py
