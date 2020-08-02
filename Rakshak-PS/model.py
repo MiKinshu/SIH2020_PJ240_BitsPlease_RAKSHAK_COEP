@@ -24,7 +24,7 @@ from pathlib import Path
 
 # Return if model.save exists
 def check_for_saved_model() -> bool:
-    return bool(constants.FILENAME.is_file())
+    return bool(Path(constants.FILENAME).is_file())
 
 
 # Train model on existing mocked dataset
