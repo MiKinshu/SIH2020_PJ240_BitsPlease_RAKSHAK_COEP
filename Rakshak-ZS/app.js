@@ -72,6 +72,7 @@ app.get("/network", (req, res) => {
     });
 });
 
+//Medical Fire Disaster General Emergency
 //route to register on a network
 app.post("/usenetwork", (req, res) => {
     console.log(req.body);

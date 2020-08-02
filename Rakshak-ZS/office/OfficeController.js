@@ -2,8 +2,9 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
-const report = require("../Report");
+const Report = require("../Report");
 const VerifyToken = require("./VerifyToken");
+
 
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
@@ -71,12 +72,28 @@ router.post("/register", function(req, res) {
 });
 
 router.post("/me", VerifyToken, function(req, res, next) {
-    console.log(req.officeId);
+    console.log(req.body.accessToken);
     Office.findById(req.officeId, { password: 0 }, function(err, office) {
         if (err)
             return res.status(500).send({ "auth": false });
         if (!office) return res.status(404).send({ "auth": false });
-        res.status(200).send({ "auth": true, "office": office });
+
+        var type = "general";
+        if (office.type == 0) {
+            type = "Medical";
+        } else if (office.type == 1) {
+            type = "general";
+        } else if (office.type == 2) {
+            type = "Fire";
+        } else if (office.type == 4) {
+            type = "Disaster";
+        }
+
+        Report.find({ type: type }, function(err, reports) {
+            //console.log(req.params.networkId);
+            res.status(200).send({ "auth": true, "office": office, "reports": reports });
+        });
+
     });
 });
 
