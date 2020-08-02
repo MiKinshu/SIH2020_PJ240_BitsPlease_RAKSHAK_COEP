@@ -2,7 +2,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const admin = require("./firebase");
-const request = require("request");
 const mongoose = require("mongoose");
 const Report = require("./Report");
 
@@ -22,6 +21,7 @@ mongoose.connect("mongodb+srv://test:test@cluster0-vi5m5.mongodb.net/test?retryW
   useUnifiedTopology: true,
   useNewUrlParser: true
 });
+const Network = mongoose.model("Network");
 
 //Getting the Users db
 const Users = admin.database().ref("users");
@@ -53,26 +53,50 @@ app.get("/", (req, res)=>{
     res.send("Hi!");
 });
 
-
+// route to view all reports
 app.get("/reports", (req, res)=>{
     Report.find({}, function(err, reports){
         console.log(req.params.networkId);
-        let response  = [];
-        reports.forEach(element => {
-              let temp = {
-                uid: element.uid,
-                msg: element.msg,
-                type: element.type,
-                date: element.date,
-                name: element.name,
-                networkId: element.networkId
-              };
-              response.push(temp);
-              console.log(temp);
-        });
-        response.reverse();
-        res.send(response);
+        res.send(reports);
     });
+});
+
+app.get("/network", (req, res)=>{
+  Network.find({}, function(err, reports){
+      console.log(reports);
+      res.send(reports);
+  });
+});
+
+//route to register on a network
+app.post("/usenetwork", (req, res)=>{
+  console.log(req.body);
+  Network.findOne({networkId: req.body.networkId}, (err, network)=>{
+    network.users.push(req.body.uid);
+    res.send("Updated!");
+  })
+});
+
+// Network Server Raisng an alert, sends everyone in the network a notification
+app.post("/raiseAlert", function (req, res){
+  console.log(req.body);
+  Network.findOne({networkId: req.body.networkId}, (err, network)=>{
+  const userstoSend = network.users;
+  // firebaseUsers.on("value", function(snapshot) {
+  //   let tokens = snapshot.val();
+  //   Object.keys(tokens).forEach(function(key) {
+  //     //Decide whether the current key is viable for sending the message
+  //       if (userstoSend.includes(key) && isViable(key) && tokens[key]!=='ABCD'){
+  //       //console.log(tokens[key]);
+  //       message(tokens[key], "18 71", "general", req.body.info);
+  //       } 
+  //   });
+  //   }, function (errorObject) {
+  //     console.log("The read failed: " + errorObject.code);
+  //   });
+  console.log(userstoSend);
+    res.redirect("https://rakshak-local.herokuapp.com/home?alert=true");
+  });
 });
 
 // Handling requests from Users
@@ -85,7 +109,7 @@ app.post("/requests", (req, res)=>{
             uid: req.body.uid,
             msg: req.body.msg,
             loc: req.body.loc,
-            networkID: record.networkID,
+            networkId: record.networkId,
             name: record.displayName,
             phone: record.phoneNumber
         },
