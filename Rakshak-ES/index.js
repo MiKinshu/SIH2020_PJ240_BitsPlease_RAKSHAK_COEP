@@ -20,7 +20,15 @@ var handlebars = require("express-handlebars").create({
         },
         ifnequal: function(a, b, opts) {
             if (a != b) {
-                return "Officer Messege: <b>" + b + "</b>";
+                return "Officer Message: <b>" + b + "</b>";
+
+            } else {
+                return opts.inverse(this);
+            }
+        },
+        ifOnequal: function(a, b, opts) {
+            if (a != b) {
+                return "Officer Name: <b>" + b + "</b>";
 
             } else {
                 return opts.inverse(this);
