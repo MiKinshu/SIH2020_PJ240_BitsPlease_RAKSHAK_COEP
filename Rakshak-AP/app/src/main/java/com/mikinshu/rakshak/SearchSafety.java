@@ -23,6 +23,7 @@ public class SearchSafety extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_safety);
 
+        getSupportActionBar().hide();
         rotateButton=findViewById(R.id.BTNrotate);
         txtView= findViewById(R.id.perText);
 

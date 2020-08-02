@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Locale;
 import java.util.Objects;
 
 import static com.mikinshu.rakshak.NoNetworkActivity.mLat;
@@ -39,7 +40,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         Log.d(TAG, "onMessageReceived: Recieved"+remoteMessage.getData());
 
         String emergencyType,title,message;
-        emergencyType=remoteMessage.getData().get("type");
+        emergencyType = remoteMessage.getData().get("type");
         assert emergencyType != null;
         if (emergencyType.equalsIgnoreCase("general"))
         {
@@ -79,8 +80,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         super.onMessageReceived(remoteMessage);
     }
 
-    double getDistanceFromEmergency(String lat1,String lon1)
-    {
+    double getDistanceFromEmergency(String lat1,String lon1) {
         String lat2= mLat;
         String lon2 = mLon;
         return distance(Double.parseDouble(lat1),Double.parseDouble(lon1),Double.parseDouble(lat2),Double.parseDouble(lon2));
@@ -115,10 +115,15 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String channelName = "Channel Name";
         int importance = NotificationManager.IMPORTANCE_HIGH;
 
-        Uri gmmIntentUri = Uri.parse("geo:"+lat+","+lon+"?z=15");
+        Uri gmmIntentUri = Uri.parse("geo:" + lat + "," + lon + "?z=15");
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         mapIntent.setPackage("com.google.android.apps.maps");
-        startActivity(mapIntent);
+//        mapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(mapIntent);
+
+//        String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?q=loc:%f,%f", 28.43242324,77.8977673);
+//        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+//        startActivity(intent);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel mChannel = new NotificationChannel(
@@ -130,6 +135,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
                 .setContentText(body);
+        mBuilder.setAutoCancel(true);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addNextIntent(mapIntent);
