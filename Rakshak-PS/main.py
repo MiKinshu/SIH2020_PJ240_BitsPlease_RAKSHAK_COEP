@@ -5,6 +5,7 @@ import model
 import encoding
 import proximity
 import numpy as np
+import os
 
 app = Flask(__name__)
 
@@ -32,4 +33,5 @@ def predict(military_time, lat, longitude, age, gender) -> float:
 
 # run it directly via python3 main.py
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
