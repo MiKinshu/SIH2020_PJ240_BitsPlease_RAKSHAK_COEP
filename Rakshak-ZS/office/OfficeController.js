@@ -2,8 +2,9 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
-const report = require("../Report");
+const Report = require("../Report");
 const VerifyToken = require("./VerifyToken");
+
 
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
@@ -70,13 +71,50 @@ router.post("/register", function(req, res) {
     );
 });
 
+router.get("/assign/:reportId", (req, res)=>{
+    console.log(req.body);
+    Report.findById(req.params.reportId, (err, report)=>{
+        if(err){
+            console.log(err);
+            res.send("Something went Wrong");
+        }
+        report.status = "assigned";
+        report.officerId = "prateek123";
+        const dummyOfficers = ["Manthan", "Prateek", "Ritik", "Mrigyen"];
+        const dummyNumbers = ["7776789899", "7776744499", "9876789899", "6616789899"];
+        const k = Math.floor(Math.random() * 4);
+        report.officerName = dummyOfficers[k];
+        report.save((err) => {
+            if (err) res.send("Something went wrong");
+            console.log("done")
+            res.redirect("https://rakshak-es.herokuapp.com/home");
+        });
+    })
+})
+
 router.post("/me", VerifyToken, function(req, res, next) {
-    console.log(req.officeId);
+    console.log(req.body.accessToken);
     Office.findById(req.officeId, { password: 0 }, function(err, office) {
         if (err)
             return res.status(500).send({ "auth": false });
         if (!office) return res.status(404).send({ "auth": false });
-        res.status(200).send({ "auth": true, "office": office });
+
+        var type = "General Emergency";
+        if (office.type == 0) {
+            type = "Medical";
+        } else if (office.type == 1) {
+            type = "General Emergency";
+        } else if (office.type == 2) {
+            type = "Fire";
+        } else if (office.type == 4) {
+            type = "Disaster";
+        }
+
+        Report.find({ type: type }, function(err, reports) {
+            //console.log(req.params.networkId);
+            res.status(200).send({ "auth": true, "office": office, "reports": reports });
+        });
+
     });
 });
 

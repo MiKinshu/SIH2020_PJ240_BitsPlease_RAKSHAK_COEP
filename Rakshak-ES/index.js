@@ -10,12 +10,37 @@ var handlebars = require("express-handlebars").create({
             if (!this._sections) this._sections = {};
             this._sections[name] = options.fn(this);
             return null;
+        },
+        ifequal: function(a, b, opts) {
+            if (a == b) {
+                return opts.fn(this);
+            } else {
+                return opts.inverse(this);
+            }
+        },
+        ifnequal: function(a, b, opts) {
+            if (a != b) {
+                return "Officer Message: <b>" + b + "</b>";
+
+            } else {
+                return opts.inverse(this);
+            }
+        },
+        ifOnequal: function(a, b, opts) {
+            if (a != b) {
+                return "Officer Name: <b>" + b + "</b>";
+
+            } else {
+                return opts.inverse(this);
+            }
         }
     }
 });
 
 app.engine("handlebars", handlebars.engine);
 app.set("view engine", "handlebars");
+
+
 
 // add body parser
 var cookieParser = require("cookie-parser");
@@ -49,14 +74,46 @@ app.get("/login", (req, res) => {
 
 
 app.get("/home", (req, res) => {
-    res.render("home", {
-        officeName: "office Here",
-        type: "Hospitaa",
-        officerCount: 10,
-        pendingRequests: 5,
-        totalRequests: 100,
-        resolvedRequests: 95
-    });
+
+    var request = require("request");
+    var token = req.cookies.auth;
+    var alert = false;
+    if (req.query.alert) {
+        alert = true;
+    }
+    request.post(
+        "https://rakshak-zs.herokuapp.com/office/me", {
+            json: { accessToken: token }
+        },
+        function(error, response, body) {
+            if (error || (response.body.auth !== true)) {
+                console.log("haa");
+                res.redirect("login");
+            } else {
+                // console.log(response.body.reports);
+                //response.body.reports[0].status = "completed";
+                //    response.body.reports[response.body.reports.length - 1].status = "completed";
+                // response.body.reports[response.body.reports.length - 1].msg = "completeda";
+                response.body.reports = response.body.reports.reverse();
+                var x = 0;
+                for (var i = 0; i < response.body.reports.length; i++) {
+                    //        response.body.reports[i].loc = response.body.reports[i].replace(" ", ',');
+                    if (response.body.reports[i].status == "completed") {
+                        x++;
+                    }
+                }
+                res.render("home", {
+                    office: response.body.office,
+                    officerCount: 10,
+                    reports: response.body.reports,
+                    pendingRequests: response.body.reports.length - x,
+                    totalRequests: response.body.reports.length,
+                    resolvedRequests: x
+                });
+            }
+        }
+    );
+
 });
 
 app.get("/register", (req, res) => {

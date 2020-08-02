@@ -67,7 +67,14 @@ public class NoNetworkActivity extends AppCompatActivity {
     }
 
     public void handleWalkieTalkie(View view) {
+        Log.d("Microsoft", "aa");
         Intent intent = new Intent(NoNetworkActivity.this, com.mikinshu.rakshak.WalkiTalkie.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
+        NoNetworkActivity.this.finish();
     }
 }

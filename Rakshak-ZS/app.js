@@ -72,6 +72,7 @@ app.get("/network", (req, res) => {
     });
 });
 
+//Medical Fire Disaster General Emergency
 //route to register on a network
 app.post("/usenetwork", (req, res) => {
     console.log(req.body);
@@ -116,6 +117,7 @@ app.post("/requests", (req, res) => {
             Report.create({
                     uid: req.body.uid,
                     msg: req.body.msg,
+                    type: req.body.type,
                     loc: req.body.loc,
                     networkId: snapshot.val()[uid].NetworkID,
                     name: snapshot.val()[uid].Name,

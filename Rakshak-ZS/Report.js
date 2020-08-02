@@ -30,7 +30,7 @@ var ReportSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        default: "general"
+        default: "General Emergency"
     },
     loc: {
         type: String,
