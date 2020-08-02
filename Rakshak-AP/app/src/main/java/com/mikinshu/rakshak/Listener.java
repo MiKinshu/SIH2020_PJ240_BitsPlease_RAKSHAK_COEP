@@ -91,6 +91,7 @@ public class Listener extends Service {
                     if(!isNetworkAvailable()) {
                         //sending w/o signal
                         Log.d(TAG, "onReceived: identifier is "+ identifier);
+                        Toast.makeText(Listener.this, "Received Message", Toast.LENGTH_SHORT).show();
                         if(Received.contains(identifier)) {
                             Toast.makeText(Listener.this, "Repeated Receive, not forwarding", Toast.LENGTH_SHORT).show();
                         }
