@@ -11,16 +11,17 @@ var handlebars = require("express-handlebars").create({
             this._sections[name] = options.fn(this);
             return null;
         },
-        'ifequal': function(a, b, opts) {
+        ifequal: function(a, b, opts) {
             if (a == b) {
                 return opts.fn(this);
             } else {
                 return opts.inverse(this);
             }
         },
-        'ifnequal': function(a, b, opts) {
+        ifnequal: function(a, b, opts) {
             if (a != b) {
-                return opts.fn(this);
+                return "Officer Messege: <b>" + b + "</b>";
+
             } else {
                 return opts.inverse(this);
             }
@@ -83,7 +84,8 @@ app.get("/home", (req, res) => {
             } else {
                 // console.log(response.body.reports);
                 //response.body.reports[0].status = "completed";
-         //       response.body.reports[response.body.reports.length - 1].status = "completed";
+                //    response.body.reports[response.body.reports.length - 1].status = "completed";
+                // response.body.reports[response.body.reports.length - 1].msg = "completeda";
                 response.body.reports = response.body.reports.reverse();
                 var x = 0;
                 for (var i = 0; i < response.body.reports.length; i++) {
