@@ -56,7 +56,7 @@ class _ProfileSetupState extends State<ProfileSetup> {
       print(t);
       token = t;
     });
-    
+
 
     if(nameText.text.isEmpty || idText.text.isEmpty){
       Fluttertoast.showToast(msg: 'Please enter details');

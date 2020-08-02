@@ -28,20 +28,19 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Emergency> emergencies = [
     Emergency(
         emergencyType: 'Emergency headline',
-        reportedBy: 'Roshni Prajapati',
-        reportedAt: '12:34 am, July-08-2020',
+        reportedBy: 'Manthan Surkar',
+        reportedAt: '11:05 am, Aug-03-2020',
         location: 'Area Details',
-        phoneNo: '+919598227422'),
+        phoneNo: '+916584962136'),
     Emergency(
         emergencyType: 'Emergency headline',
         reportedBy: 'Roshni Prajapati',
-        reportedAt: '12:34 am, July-08-2020',
+        reportedAt: '12:34 am, Aug-02-2020',
         location: 'Area Details',
         phoneNo: '+919598227422'),
   ];
 
-  someMethod(){
-
+  listenForNotifications(){
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -61,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     //TODO: Fetch Data via Post Requests
-    someMethod();
+    listenForNotifications();
   }
 
   @override

@@ -105,7 +105,7 @@ class _AuthScreenState extends State<AuthScreen> {
               inputBox: InputBox(
                 textEditingController: otpText,
                 hintText: 'Enter OTP',
-                descriptionText: 'OTP Sent',
+                descriptionText: 'Please enter 6-digit otp sent to your phone number',
               ),
               requiredBackButton: true,
               onBackPressed: (){
