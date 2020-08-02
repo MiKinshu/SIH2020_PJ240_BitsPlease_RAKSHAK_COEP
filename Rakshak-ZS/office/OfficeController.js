@@ -71,6 +71,23 @@ router.post("/register", function(req, res) {
     );
 });
 
+router.get("/assign/:reportId", (req, res)=>{
+    console.log(req.body);
+    Report.findById(req.params.reportId, (err, report)=>{
+        if(err){
+            console.log(err);
+            res.send("Something went Wrong");
+        }
+        report.status = "assigned";
+        report.officerId = "prateek123";
+        report.save((err) => {
+            if (err) res.send("Something went wrong");
+            console.log("done")
+            res.redirect("http://localhost:3000/home");
+        });
+    })
+})
+
 router.post("/me", VerifyToken, function(req, res, next) {
     console.log(req.body.accessToken);
     Office.findById(req.officeId, { password: 0 }, function(err, office) {
