@@ -35,6 +35,14 @@ var ReportSchema = new mongoose.Schema({
   loc:{
       type: String,
       default: ""
+  },
+  status:{
+      type: String,
+      default: "created"
+  },
+  info:{
+    type: String,
+    default: ""
   }
 });
 mongoose.model("Report", ReportSchema);
