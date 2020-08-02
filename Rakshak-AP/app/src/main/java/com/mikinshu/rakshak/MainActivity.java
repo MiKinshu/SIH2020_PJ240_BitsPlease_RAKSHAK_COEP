@@ -113,13 +113,10 @@ public class MainActivity extends AppCompatActivity {
                             .setIsSmartLockEnabled(false)
                             .setLogo(R.drawable.ic_namelogoblue)//Experiment with this.
                             .setAvailableProviders(Arrays.asList(
-                                    new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                    new AuthUI.IdpConfig.EmailBuilder().build(),
                                     new AuthUI.IdpConfig.PhoneBuilder().build()))
                             .build(),
                     RC_SIGN_IN);
-        } else
-        {
+        } else {
             SetupApplication();
         }
     }
@@ -374,6 +371,10 @@ public class MainActivity extends AppCompatActivity {
                     makeCall(Emergency);
                 }
             });
+        }
+        else{
+            Intent intent = new Intent(MainActivity.this, NoNetworkActivity.class);
+            startActivity(intent);
         }
     }
 
