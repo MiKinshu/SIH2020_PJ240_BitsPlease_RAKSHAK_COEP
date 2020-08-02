@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:rakshak_ea/constants.dart';
 import 'package:rakshak_ea/screens/auth_screen.dart';
@@ -29,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context)=>AuthScreen(),
             ));
+            FirebaseAuth.instance.signOut();
           },
         ),
         body: Center(child: Text('Welcome to Home Page')),
