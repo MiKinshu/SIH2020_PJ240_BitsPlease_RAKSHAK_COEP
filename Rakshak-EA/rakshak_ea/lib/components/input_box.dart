@@ -13,6 +13,8 @@ class InputBox extends StatelessWidget {
     return Column(
       children: <Widget>[
         TextField(
+          style: TextStyle(fontSize: 18),
+          cursorColor: Colors.black,
           focusNode: focusNode,
           controller: textEditingController,
           decoration: InputDecoration(

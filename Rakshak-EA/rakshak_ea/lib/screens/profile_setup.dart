@@ -23,6 +23,7 @@ class _ProfileSetupState extends State<ProfileSetup> {
   bool isSaving = false;
   int _currentIndex = 0;
   PageController _pageController = PageController();
+  String fullName;
 
   saveDataInFirebase(){
     //Save data to firebase
@@ -86,20 +87,29 @@ class _ProfileSetupState extends State<ProfileSetup> {
               TemplateColumn(
                 titleText: 'About You',
                 inputBox: InputBox(
+                  textEditingController: nameText,
                   descriptionText: 'Your name registered at office',
                   hintText: 'Your Full Name',
                 ),
                 bottomButtonText: 'NEXT',
                 onBottomButtonPressed: (){
-                  _pageController.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.linear);
+                  fullName = nameText.text;
+                  _pageController.animateToPage(
+                      1, duration: Duration(milliseconds: 500),
+                      curve: Curves.linear);
                 },
               ),
               TemplateColumn(
                 titleText: 'About You',
                 inputBox: InputBox(
+                  textEditingController: idText,
                   descriptionText: 'The Id registered for your department',
                   hintText: 'Office ID',
                 ),
+                requiredBackButton: true,
+                onBackPressed: (){
+                  _pageController.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.linear);
+                },
                 bottomButtonText: 'DONE',
                 onBottomButtonPressed: (){
                   saveProfile();
