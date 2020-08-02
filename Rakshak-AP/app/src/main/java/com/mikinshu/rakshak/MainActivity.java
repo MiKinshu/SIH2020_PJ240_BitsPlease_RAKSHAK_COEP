@@ -116,7 +116,10 @@ public class MainActivity extends AppCompatActivity {
                                     new AuthUI.IdpConfig.PhoneBuilder().build()))
                             .build(),
                     RC_SIGN_IN);
-        } else SetupApplication();
+        } else
+        {
+            SetupApplication();
+        }
     }
 
     @Override
@@ -171,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             mUid = user.getUid();
+            saveUID(mUid);
             AddTokenToFirebase();
             FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
             DatabaseReference mUsersDatabaseReference = firebaseDatabase.getReference().child("Users").child(mUid);
@@ -216,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "SetupApplication: Called");
         AskPermissions();
         SetUpChirp();
+        getUID();
         startService(new Intent(getApplicationContext(), Listener.class));
         if(isNetworkAvailable()){
             //set up the network features.
@@ -281,7 +286,61 @@ public class MainActivity extends AppCompatActivity {
             BTNInNetCommunity.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("Enter your organisation network ID key");
 
+                    final EditText input = new EditText(MainActivity.this);
+                    builder.setView(input);
+
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            RequestBody body = new FormBody.Builder()
+                                    .add("uid", mUid)
+                                    .add("key", input.getText().toString())
+                                    .build();
+                            Request request = new Request.Builder()
+                                    .url(getResources().getString(R.string.server) + "usenetwork")
+                                    .post(body)
+                                    .build();
+                            Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
+
+                            client.newCall(request).enqueue(new Callback() {
+
+                                @Override
+                                public void onResponse(@NotNull Call call, @NotNull final Response response){
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            MainActivity.this.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    try {
+                                                        Toast.makeText(getApplicationContext(), response.body().string(), Toast.LENGTH_SHORT).show();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                            organisation = input.getText().toString();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builder.show();
                 }
             });
 
@@ -370,6 +429,18 @@ public class MainActivity extends AppCompatActivity {
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    //getting UID from the disk.
+    void getUID(){
+        SharedPreferences faveditor = getSharedPreferences("com.mikinshu.rakshak.ref", MODE_PRIVATE);
+        mUid = faveditor.getString("UID", "error_in_getting_UID");
+    }
+
+    void saveUID(String UID){
+        SharedPreferences.Editor faveditor = getSharedPreferences("com.mikinshu.rakshak.ref", MODE_PRIVATE).edit();
+        faveditor.putString("UID", UID);
+        faveditor.apply();
     }
 
     //Makes network call and call to the respective service from the phone.
