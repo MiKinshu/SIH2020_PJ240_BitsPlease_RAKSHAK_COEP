@@ -83,7 +83,7 @@ app.get("/home", (req, res) => {
             } else {
                 // console.log(response.body.reports);
                 //response.body.reports[0].status = "completed";
-                response.body.reports[response.body.reports.length - 1].status = "completed";
+         //       response.body.reports[response.body.reports.length - 1].status = "completed";
                 response.body.reports = response.body.reports.reverse();
                 var x = 0;
                 for (var i = 0; i < response.body.reports.length; i++) {
