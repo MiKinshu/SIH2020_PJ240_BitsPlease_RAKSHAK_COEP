@@ -5,6 +5,7 @@ import model
 import encoding
 import proximity
 import numpy as np
+import random
 import os
 
 app = Flask(__name__)
