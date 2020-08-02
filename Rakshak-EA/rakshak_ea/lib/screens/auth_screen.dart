@@ -15,7 +15,7 @@ class _AuthScreenState extends State<AuthScreen> {
   String smsCode;
   String verificationId;
   String initialText;
-  TextEditingController phoneText = TextEditingController(text: '+91 ');
+  TextEditingController phoneText = TextEditingController();
   TextEditingController otpText = TextEditingController();
   PageController _pageController = PageController();
 
@@ -31,10 +31,10 @@ class _AuthScreenState extends State<AuthScreen> {
 
     final PhoneVerificationCompleted verificationSuccess =
         (AuthCredential credential) {
-      print('Auto-Verification');
-      Fluttertoast.showToast(msg: 'Verification Successful');
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => ProfileSetup(phoneNo)));
+      print('Auto-Verification OFF');
+//      Fluttertoast.showToast(msg: 'Verification Successful');
+//      Navigator.push(context,
+//          MaterialPageRoute(builder: (context) => ProfileSetup(phoneNo)));
     };
 
     final PhoneCodeSent smsCodeSent = (String verID, [int forceCodeResend]) {
@@ -45,7 +45,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final PhoneVerificationFailed verificationFailed =
         (AuthException exception) {
       print('$exception.message');
-      Fluttertoast.showToast(msg: 'Verification Limit exceeded on this number');
+      Fluttertoast.showToast(msg: 'Phone Number Error');
       _pageController.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.linear);
     };
 
@@ -64,6 +64,7 @@ class _AuthScreenState extends State<AuthScreen> {
       smsCode: smsCode,
     );
     await FirebaseAuth.instance.signInWithCredential(credential).then((user) {
+      print(user.additionalUserInfo);
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => ProfileSetup(phoneNo)));
       Fluttertoast.showToast(msg: 'Verification Successful');
@@ -90,7 +91,7 @@ class _AuthScreenState extends State<AuthScreen> {
               bottomButtonText: 'NEXT',
               onBottomButtonPressed: (){
                 if(phoneText.text.isNotEmpty) {
-                  this.phoneNo = phoneText.text;
+                  phoneNo = '+91' + phoneText.text;
                   _pageController.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.linear);
                   verifyNumber();
                 }
