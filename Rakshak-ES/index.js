@@ -1,6 +1,7 @@
 //calling express
 var express = require("express");
 app = express();
+var dateFormat = require('dateformat');
 
 //handle bars with section
 var handlebars = require("express-handlebars").create({
@@ -90,13 +91,15 @@ app.get("/home", (req, res) => {
                 console.log("haa");
                 res.redirect("login");
             } else {
-                // console.log(response.body.reports);
+                // console.logas(response.body.reports);
                 //response.body.reports[0].status = "completed";
                 //    response.body.reports[response.body.reports.length - 1].status = "completed";
                 // response.body.reports[response.body.reports.length - 1].msg = "completeda";
                 response.body.reports = response.body.reports.reverse();
+
                 var x = 0;
                 for (var i = 0; i < response.body.reports.length; i++) {
+                    response.body.reports[i].date = dateFormat(new Date(response.body.reports[i].date).toISOString(), "dddd, mmmm dS, yyyy, h:MM:ss TT");
                     //        response.body.reports[i].loc = response.body.reports[i].replace(" ", ',');
                     if (response.body.reports[i].status == "completed") {
                         x++;
@@ -129,7 +132,7 @@ app.post("/register", (req, res) => {
                 name: req.body.name,
                 password: req.body.password,
                 officeId: req.body.officeId,
-                Type: req.body.type
+                type: req.body.type
             }
         },
         function(error, response, body) {
