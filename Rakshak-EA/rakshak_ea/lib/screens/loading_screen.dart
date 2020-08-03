@@ -20,12 +20,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
       String name = prefs.getString(kPrefName);
       String id = prefs.getString(kPrefOfficeId);
       String phoneNumber = prefs.getString(kPrefPhoneNo);
+      String uid = prefs.getString(kPrefUID);
+      String token = prefs.getString(kPrefToken);
+
       Navigator.pushReplacement(context,
           MaterialPageRoute(
               builder: (context)=> HomeScreen(
                 name: name,
                 officerId: id,
                 phoneNo: phoneNumber,
+                uid: uid,
+                token: token,
               )
           ));
     }

@@ -3,8 +3,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:rakshak_ea/components/emergency_tile.dart';
 import 'package:rakshak_ea/constants.dart';
 import 'package:rakshak_ea/emergency.dart';
@@ -16,8 +14,10 @@ class HomeScreen extends StatefulWidget {
   final String name;
   final String officerId;
   final String phoneNo;
+  final String uid;
+  final String token;
 
-  HomeScreen({this.name, this.officerId, this.phoneNo});
+  HomeScreen({this.name, this.officerId, this.phoneNo,this.token,this.uid});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print('on message $message');
-        Notifications().generate('Emergency', 'You have been assigned an emergency');
+        Notifications().generate(message['data']['title'], '${message['data']['body']} reported this emergency');
       },
       onResume: (Map<String, dynamic> message) async {
         print('on resume $message');
@@ -65,92 +65,97 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-            actions: <Widget>[
-              IconButton(
-                color: Colors.black,
-                icon: Icon(Icons.search),
-                onPressed: () {},
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+              actions: <Widget>[
+                IconButton(
+                  color: Colors.black,
+                  icon: Icon(Icons.search),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  color: Colors.black,
+                  icon: Icon(Icons.clear),
+                  onPressed: () async {
+                    //Signing Out
+                    showDialog(
+                      context: context,
+                      builder: (context) => showExitDialog(context),
+                    );
+                  },
+                )
+              ],
+              backgroundColor: Colors.white,
+              bottom: TabBar(
+                labelColor: kThemeDark,
+                indicatorColor: kThemeDark,
+                tabs: [
+                  Tab(
+                      child: Text('ALL'),
+                      icon: Icon(Icons.view_list)),
+                  Tab(
+                      child: Text('ONGOING'),
+                      icon: Icon(Icons.call_missed_outgoing)),
+                  Tab(
+                    child: Text('COMPLETED'),
+                    icon: Icon(Icons.done_outline),
+                  ),
+                ],
               ),
-              IconButton(
-                color: Colors.black,
-                icon: Icon(Icons.clear),
-                onPressed: () async {
-                  //Signing Out
-                  showDialog(
-                    context: context,
-                    builder: (context) => showExitDialog(context),
+              title: Image(
+                height: 40,
+                image: AssetImage('images/rakshak_hero_black.png'),
+              )),
+          body: TabBarView(
+            children: [
+              ListView.builder(
+                itemCount: emergencies.length,
+                itemBuilder: (context, index) {
+                  return EmergencyTile(
+                    emergencyType: emergencies[index].emergencyType,
+                    reportedAt: emergencies[index].reportedAt,
+                    reportedBy: emergencies[index].reportedBy,
+                    phoneNo: emergencies[index].phoneNo,
+                    location: emergencies[index].location,
                   );
                 },
-              )
+              ),
+              ListView.builder(
+                itemCount: emergencies.length,
+                itemBuilder: (context, index) {
+                  return EmergencyTile(
+                    emergencyType: emergencies[index].emergencyType,
+                    reportedAt: emergencies[index].reportedAt,
+                    reportedBy: emergencies[index].reportedBy,
+                    phoneNo: emergencies[index].phoneNo,
+                    location: emergencies[index].location,
+                  );
+                },
+              ),
+              ListView.builder(
+                itemCount: emergencies.length,
+                itemBuilder: (context, index) {
+                  return EmergencyTile(
+                    emergencyType: emergencies[index].emergencyType,
+                    reportedAt: emergencies[index].reportedAt,
+                    reportedBy: emergencies[index].reportedBy,
+                    phoneNo: emergencies[index].phoneNo,
+                    location: emergencies[index].location,
+                  );
+                },
+              ),
             ],
-            backgroundColor: Colors.white,
-            bottom: TabBar(
-              labelColor: kThemeDark,
-              indicatorColor: kThemeDark,
-              tabs: [
-                Tab(
-                    child: Text('ALL'),
-                    icon: Icon(Icons.view_list)),
-                Tab(
-                    child: Text('ONGOING'),
-                    icon: Icon(Icons.call_missed_outgoing)),
-                Tab(
-                  child: Text('COMPLETED'),
-                  icon: Icon(Icons.done_outline),
-                ),
-              ],
-            ),
-            title: Image(
-              height: 40,
-              image: AssetImage('images/rakshak_hero_black.png'),
-            )),
-        body: TabBarView(
-          children: [
-            ListView.builder(
-              itemCount: emergencies.length,
-              itemBuilder: (context, index) {
-                return EmergencyTile(
-                  emergencyType: emergencies[index].emergencyType,
-                  reportedAt: emergencies[index].reportedAt,
-                  reportedBy: emergencies[index].reportedBy,
-                  phoneNo: emergencies[index].phoneNo,
-                  location: emergencies[index].location,
-                );
-              },
-            ),
-            ListView.builder(
-              itemCount: emergencies.length,
-              itemBuilder: (context, index) {
-                return EmergencyTile(
-                  emergencyType: emergencies[index].emergencyType,
-                  reportedAt: emergencies[index].reportedAt,
-                  reportedBy: emergencies[index].reportedBy,
-                  phoneNo: emergencies[index].phoneNo,
-                  location: emergencies[index].location,
-                );
-              },
-            ),
-            ListView.builder(
-              itemCount: emergencies.length,
-              itemBuilder: (context, index) {
-                return EmergencyTile(
-                  emergencyType: emergencies[index].emergencyType,
-                  reportedAt: emergencies[index].reportedAt,
-                  reportedBy: emergencies[index].reportedBy,
-                  phoneNo: emergencies[index].phoneNo,
-                  location: emergencies[index].location,
-                );
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
+
+  Future<bool> _onWillPop() async => SystemChannels.platform.invokeMethod('SystemNavigator.pop');
 
   signOutUser(BuildContext context) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
