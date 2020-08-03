@@ -15,8 +15,9 @@ class _AuthScreenState extends State<AuthScreen> {
   String smsCode;
   String verificationId;
   String initialText;
-  TextEditingController phoneText = TextEditingController(text: '+91 ');
-
+  TextEditingController phoneText = TextEditingController();
+  TextEditingController otpText = TextEditingController();
+  PageController _pageController = PageController();
 
   @override
   void initState() {
@@ -25,27 +26,27 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> verifyNumber() async {
     final PhoneCodeAutoRetrievalTimeout autoRetrieve = (String verID) {
-      this.verificationId = verID;
-      smsCodeDialog(context);
+      verificationId = verID;
     };
 
     final PhoneVerificationCompleted verificationSuccess =
         (AuthCredential credential) {
-      print("Verified");
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => ProfileSetup(phoneNo)));
+      print('Auto-Verification OFF');
+//      Fluttertoast.showToast(msg: 'Verification Successful');
+//      Navigator.push(context,
+//          MaterialPageRoute(builder: (context) => ProfileSetup(phoneNo)));
     };
 
     final PhoneCodeSent smsCodeSent = (String verID, [int forceCodeResend]) {
       this.verificationId = verID;
-      Navigator.pop(context);
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => ProfileSetup(phoneNo)));
+      Fluttertoast.showToast(msg: 'SMS Code Sent');
     };
 
     final PhoneVerificationFailed verificationFailed =
         (AuthException exception) {
       print('$exception.message');
+      Fluttertoast.showToast(msg: 'Phone Number Error');
+      _pageController.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.linear);
     };
 
     await FirebaseAuth.instance.verifyPhoneNumber(
@@ -57,74 +58,78 @@ class _AuthScreenState extends State<AuthScreen> {
         verificationFailed: verificationFailed);
   }
 
-  Future<bool> smsCodeDialog(BuildContext context) {
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text("Enter SMS code"),
-        content: TextField(onChanged: (value) {
-          this.smsCode = value;
-        }),
-        actions: <Widget>[
-          RaisedButton(
-            color: Colors.teal,
-            child: Text(
-              "Done",
-              style: TextStyle(color: Colors.white),
-            ),
-            onPressed: () {
-              FirebaseAuth.instance.currentUser().then((user) {
-                if (user != null) {
-                  Navigator.pop(context);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProfileSetup(phoneNo)));
-                } else {
-                  Navigator.pop(context);
-                  signIn();
-                }
-              });
-            },
-          )
-        ],
-      ),
-    );
-  }
-
   signIn() async {
     final AuthCredential credential = PhoneAuthProvider.getCredential(
       verificationId: verificationId,
       smsCode: smsCode,
     );
     await FirebaseAuth.instance.signInWithCredential(credential).then((user) {
+      print(user.additionalUserInfo);
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => ProfileSetup(phoneNo)));
-    }).catchError((e) => print(e));
+      Fluttertoast.showToast(msg: 'Verification Successful');
+    }).catchError((e) {
+      print(e);
+      Fluttertoast.showToast(msg: 'Code Invalid');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: TemplateColumn(
-          titleText: 'SIGNUP',
-          inputBox: InputBox(
-            textEditingController: phoneText,
-            hintText: 'Enter Phone Number',
-            descriptionText: 'Centre will reach out to you on this active number',
-          ),
-          bottomButtonText: 'NEXT',
-          onBottomButtonPressed: (){
-            if(phoneText.text.isNotEmpty) {
-              this.phoneNo = phoneText.text;
-              verifyNumber();
-            }
-            else{
-              Fluttertoast.showToast(msg: 'Please Enter your phone number');
-            }
-          },
+        body: PageView(
+          controller: _pageController,
+          children: <Widget>[
+            TemplateColumn(
+              titleText: 'SIGNUP',
+              inputBox: InputBox(
+                textEditingController: phoneText,
+                hintText: 'Enter Phone Number',
+                descriptionText: 'Centre will reach out to you on this active number',
+              ),
+              bottomButtonText: 'NEXT',
+              onBottomButtonPressed: (){
+                if(phoneText.text.isNotEmpty) {
+                  phoneNo = '+91' + phoneText.text;
+                  _pageController.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.linear);
+                  verifyNumber();
+                }
+                else{
+                  Fluttertoast.showToast(msg: 'Please Enter your phone number');
+                }
+              },
+            ),
+            TemplateColumn(
+              titleText: 'SIGNUP',
+              inputBox: InputBox(
+                textEditingController: otpText,
+                hintText: 'Enter OTP',
+                descriptionText: 'Please enter 6-digit otp sent to your phone number',
+              ),
+              requiredBackButton: true,
+              onBackPressed: (){
+                _pageController.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.linear);
+              },
+              bottomButtonText: 'VERIFY',
+              onBottomButtonPressed: (){
+                smsCode = otpText.text;
+                FirebaseAuth.instance.currentUser().then((user) {
+                  if (user != null) {
+                    Navigator.pop(context);
+                    print('User already exits: Redirecting to setup profile');
+                    print(user.uid);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileSetup(phoneNo)));
+                  } else {
+                    signIn();
+                  }
+                });
+              },
+            ),
+          ],
         ),
       ),
     );
