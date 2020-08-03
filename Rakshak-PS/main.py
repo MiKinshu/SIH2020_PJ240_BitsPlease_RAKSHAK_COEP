@@ -5,7 +5,6 @@ import model
 import encoding
 import proximity
 import numpy as np
-import random
 import os
 
 app = Flask(__name__)
@@ -28,14 +27,10 @@ def predict(military_time, lat, longitude, age, gender) -> float:
     cos_time = encoding.cos_time(encoding.military_time_in_minutes_fn(military_time))
     prediction = model.predict(
         np.asarray([int(age), int(gender), sin_time, cos_time]).reshape(1, -1))
+    # return multiplication
     # This returns a "safety score".
     # convert to a percentage if necessary by multiplying with 100
-    extreme_danger_score = proximity_score * prediction
-    extreme_safety_score = 1 - extreme_danger_score
-
-    # mocking result for now
-    # return(str(round(encoding.score_fencing(extreme_danger_score))))
-    return str(round(random.uniform(5, 15), 2))
+    return str(1 - (proximity_score * prediction))
 
 
 # run it directly via python3 main.py
