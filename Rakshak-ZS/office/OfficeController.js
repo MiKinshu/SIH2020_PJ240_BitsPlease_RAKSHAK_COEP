@@ -12,6 +12,7 @@ router.use(bodyParser.json());
 router.use(cookieParser());
 const Office = require("./Office");
 const Officers = admin.database().ref("Officers");
+const Users = admin.database().ref("Users");
 /**
  * Configure JWT
  */
@@ -25,6 +26,27 @@ const messages = (registrationToken) => {
         data: {
             title: "Work time!",
             body: "You have been assigned a mission"
+        },
+        token: registrationToken
+    };
+    console.log(message);
+    admin.messaging().send(message)
+        .then((response) => {
+            console.log('Successfully sent message:' + registrationToken, response);
+        })
+        .catch((error) => {
+            console.log('Error sending message:' + registrationToken, error);
+        });
+};
+
+const messageus = (registrationToken, location, type, msg, reportID) => {
+    var message = {
+        data: {
+            name: reportID,
+            loc: location,
+            type: type,
+            msg: msg,
+            status: "2"
         },
         token: registrationToken
     };
@@ -116,7 +138,19 @@ router.get("/assign/:reportId/:officeId", (req, res) => {
                 report.officerName = dummyOfficers[k];
                 report.save((err) => {
                     if (err) res.send("Something went wrong");
-                    console.log("done")
+                    console.log("done");
+                    Users.on("value", function(snapshot) {
+                        let tokens = snapshot.val();
+                        Object.keys(tokens).forEach(function(key) {
+                            //Decide whether the current key is viable for sending the message
+                            if (key==report.uid) {
+                                //console.log(tokens[key]);
+                                messageus(tokens[key].Token, "18 71", "general", req.body.info, report.officerName);
+                            }
+                        });
+                    }, function(errorObject) {
+                        console.log("The read failed: " + errorObject.code);
+                    });
                     res.redirect("https://rakshak-es.herokuapp.com/home");
                 });
             }
@@ -132,6 +166,18 @@ router.get("/assign/:reportId/:officeId", (req, res) => {
                     report.save((err) => {
                         if (err) res.send("Something went wrong");
                         console.log("done");
+                        Users.on("value", function(snapshot) {
+                            let tokens = snapshot.val();
+                            Object.keys(tokens).forEach(function(key) {
+                                //Decide whether the current key is viable for sending the message
+                                if (key==report.uid) {
+                                    //console.log(tokens[key]);
+                                    messageus(tokens[key].Token, "18 71", "general", req.body.info, report.officerName);
+                                }
+                            });
+                        }, function(errorObject) {
+                            console.log("The read failed: " + errorObject.code);
+                        });
                         res.redirect("https://rakshak-es.herokuapp.com/home");
                     });
                 }, function(errorObject) {

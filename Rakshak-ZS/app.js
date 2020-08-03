@@ -36,7 +36,8 @@ const message = (registrationToken, location, type, msg, reportID) => {
             reportID: reportID,
             loc: location,
             type: type,
-            msg: msg
+            msg: msg,
+            status: "0"
         },
         token: registrationToken
     };
@@ -96,7 +97,9 @@ app.get("/network", (req, res) => {
 app.post("/useoffice", (req, res) => {
     console.log(req.body);
     Office.findOne({ officeId: req.body.officeId }, (err, office) => {
+        if(office==null) res.send("no network found");
         office.officers.push(req.body.uid);
+        
         office.save((err) => {
             if (err) res.send("Something went wrong");
             res.send("Updated!");
@@ -105,8 +108,14 @@ app.post("/useoffice", (req, res) => {
 });
 app.post("/usenetwork", (req, res) => {
     console.log(req.body);
+    var hopperRef = Users.child(req.body.uid);
+        hopperRef.update({
+            "NetworkID": req.body.networkId
+        });
     Network.findOne({ networkId: req.body.networkId }, (err, network) => {
+        if(network==null) res.send("no network found");
         network.users.push(req.body.uid);
+        
         network.save((err) => {
             if (err) res.send("Something went wrong");
             res.send("Updated!");
@@ -175,7 +184,7 @@ app.post("/requests", (req, res) => {
                             let tokens = snapshot.val();
                             Object.keys(tokens).forEach(function(key) {
                                 //Decide whether the current key is viable for sending the message
-                                if (key !== uid) {
+                                if (true) {
                                     console.log(tokens[key]);
                                     message(tokens[key].Token, req.body.loc, req.body.type, req.body.msg, JSON.stringify(report._id));
                                 }
