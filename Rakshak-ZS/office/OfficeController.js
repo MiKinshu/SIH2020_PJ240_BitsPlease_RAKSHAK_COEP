@@ -145,7 +145,7 @@ router.get("/assign/:reportId/:officeId", (req, res) => {
                             //Decide whether the current key is viable for sending the message
                             if (key==report.uid) {
                                 //console.log(tokens[key]);
-                                messageus(tokens[key].Token, "18 71", "general", req.body.info, report.officerName);
+                                messageus(tokens[key].Token, "18 71", "general", "kuch bhi", report.officerName);
                             }
                         });
                     }, function(errorObject) {
@@ -172,7 +172,7 @@ router.get("/assign/:reportId/:officeId", (req, res) => {
                                 //Decide whether the current key is viable for sending the message
                                 if (key==report.uid) {
                                     //console.log(tokens[key]);
-                                    messageus(tokens[key].Token, "18 71", "general", req.body.info, report.officerName);
+                                    messageus(tokens[key].Token, "18 71", "general", "kuch bhi", report.officerName);
                                 }
                             });
                         }, function(errorObject) {
