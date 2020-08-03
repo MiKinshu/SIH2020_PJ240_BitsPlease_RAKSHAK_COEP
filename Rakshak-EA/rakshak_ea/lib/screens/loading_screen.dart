@@ -22,7 +22,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       String phoneNumber = prefs.getString(kPrefPhoneNo);
       Navigator.pushReplacement(context,
           MaterialPageRoute(
-              builder: (context)=>HomeScreen(
+              builder: (context)=> HomeScreen(
                 name: name,
                 officerId: id,
                 phoneNo: phoneNumber,

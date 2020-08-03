@@ -300,6 +300,9 @@
                   <br>
                   Location: <b><a href="https://www.google.co.uk/maps?q={{this.loc}}">Go to location</a> </b>
                   <br>
+                  {{#ifOnequal '' this.officerName }}
+                   "hello"
+                  {{/ifOnequal}}
                   {{#ifnequal '' this.msg }}
                   Officer Messege: <b>I will fix this! </b>
                   {{/ifnequal}}
@@ -311,7 +314,6 @@
                     </span>
                     <span class="text">Assign Emergency</span>
                   </a>
-                  
                    <br><br>
                    {{/ifequal}}
                   <h4 class="small font-weight-bold">Emergency {{this.status}}! <span class="float-right"> {{this.status}}!</span></h4>

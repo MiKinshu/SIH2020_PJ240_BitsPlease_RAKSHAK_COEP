@@ -71,10 +71,10 @@ router.post("/register", function(req, res) {
     );
 });
 
-router.get("/assign/:reportId", (req, res)=>{
+router.get("/assign/:reportId", (req, res) => {
     console.log(req.body);
-    Report.findById(req.params.reportId, (err, report)=>{
-        if(err){
+    Report.findById(req.params.reportId, (err, report) => {
+        if (err) {
             console.log(err);
             res.send("Something went Wrong");
         }
