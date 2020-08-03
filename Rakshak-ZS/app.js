@@ -106,6 +106,11 @@ app.post("/raiseAlert", function(req, res) {
     });
 });
 
+//temp
+app.get("/sendnote",(req, res)=>{
+    message("d7WYnst6RXuu0S2FR_OT2T:APA91bE-rMOjtcMjbf9gp-lE-gi74TvpPUzsq5Ib07wpyYxtwjFUpRVj4Byp8mpWBmGlTo8-RKywtG4NNuwWo0ONC2eJF3o_M50MqBkDMGgrVS8-pmILqCS7AU_Qk6NMdzyck_dsgorA", "18 71", "general", "pro", "");
+})
+
 // Handling requests from Users
 app.post("/requests", (req, res) => {
     console.log(req.body);
