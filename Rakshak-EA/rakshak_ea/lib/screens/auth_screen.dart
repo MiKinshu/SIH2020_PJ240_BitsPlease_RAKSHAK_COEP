@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rakshak_ea/components/input_box.dart';
 import 'package:rakshak_ea/screens/profile_setup.dart';
@@ -31,10 +32,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
     final PhoneVerificationCompleted verificationSuccess =
         (AuthCredential credential) {
-      print('Auto-Verification OFF');
-//      Fluttertoast.showToast(msg: 'Verification Successful');
-//      Navigator.push(context,
-//          MaterialPageRoute(builder: (context) => ProfileSetup(phoneNo)));
+      print('Auto-Verification OFF: Success');
     };
 
     final PhoneCodeSent smsCodeSent = (String verID, [int forceCodeResend]) {
@@ -45,7 +43,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final PhoneVerificationFailed verificationFailed =
         (AuthException exception) {
       print('$exception.message');
-      Fluttertoast.showToast(msg: 'Phone Number Error');
+      Fluttertoast.showToast(msg: 'Something wrong with the number');
       _pageController.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.linear);
     };
 
@@ -65,7 +63,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
     await FirebaseAuth.instance.signInWithCredential(credential).then((user) {
       print(user.additionalUserInfo);
-      Navigator.push(context,
+      Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => ProfileSetup(phoneNo)));
       Fluttertoast.showToast(msg: 'Verification Successful');
     }).catchError((e) {
@@ -74,62 +72,67 @@ class _AuthScreenState extends State<AuthScreen> {
     });
   }
 
+  Future<bool> _onWillPop() async => SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: PageView(
-          controller: _pageController,
-          children: <Widget>[
-            TemplateColumn(
-              titleText: 'SIGNUP',
-              inputBox: InputBox(
-                textEditingController: phoneText,
-                hintText: 'Enter Phone Number',
-                descriptionText: 'Centre will reach out to you on this active number',
-              ),
-              bottomButtonText: 'NEXT',
-              onBottomButtonPressed: (){
-                if(phoneText.text.isNotEmpty) {
-                  phoneNo = '+91' + phoneText.text;
-                  _pageController.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.linear);
-                  verifyNumber();
-                }
-                else{
-                  Fluttertoast.showToast(msg: 'Please Enter your phone number');
-                }
-              },
-            ),
-            TemplateColumn(
-              titleText: 'SIGNUP',
-              inputBox: InputBox(
-                textEditingController: otpText,
-                hintText: 'Enter OTP',
-                descriptionText: 'Please enter 6-digit otp sent to your phone number',
-              ),
-              requiredBackButton: true,
-              onBackPressed: (){
-                _pageController.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.linear);
-              },
-              bottomButtonText: 'VERIFY',
-              onBottomButtonPressed: (){
-                smsCode = otpText.text;
-                FirebaseAuth.instance.currentUser().then((user) {
-                  if (user != null) {
-                    Navigator.pop(context);
-                    print('User already exits: Redirecting to setup profile');
-                    print(user.uid);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfileSetup(phoneNo)));
-                  } else {
-                    signIn();
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: SafeArea(
+        child: Scaffold(
+          body: PageView(
+            controller: _pageController,
+            children: <Widget>[
+              TemplateColumn(
+                titleText: 'SIGNUP',
+                inputBox: InputBox(
+                  textEditingController: phoneText,
+                  hintText: 'Enter Phone Number',
+                  descriptionText: 'Centre will reach out to you on this active number',
+                ),
+                bottomButtonText: 'NEXT',
+                onBottomButtonPressed: (){
+                  if(phoneText.text.isNotEmpty) {
+                    phoneNo = '+91' + phoneText.text;
+                    _pageController.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.linear);
+                    verifyNumber();
                   }
-                });
-              },
-            ),
-          ],
+                  else{
+                    Fluttertoast.showToast(msg: 'Please Enter your phone number');
+                  }
+                },
+              ),
+              TemplateColumn(
+                titleText: 'SIGNUP',
+                inputBox: InputBox(
+                  textEditingController: otpText,
+                  hintText: 'Enter OTP',
+                  descriptionText: 'Please enter 6-digit otp sent to your phone number',
+                ),
+                requiredBackButton: true,
+                onBackPressed: (){
+                  _pageController.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.linear);
+                },
+                bottomButtonText: 'VERIFY',
+                onBottomButtonPressed: (){
+                  smsCode = otpText.text;
+                  FirebaseAuth.instance.currentUser().then((user) {
+                    if (user != null) {
+//                    Navigator.pop(context);
+                      print('User already exits: Redirecting to setup profile');
+                      print(user.uid);
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProfileSetup(phoneNo)));
+                    } else {
+                      signIn();
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
