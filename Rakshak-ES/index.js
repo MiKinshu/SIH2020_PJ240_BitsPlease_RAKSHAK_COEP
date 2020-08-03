@@ -129,7 +129,7 @@ app.post("/register", (req, res) => {
                 name: req.body.name,
                 password: req.body.password,
                 officeId: req.body.officeId,
-                Type: req.body.type
+                type: req.body.type
             }
         },
         function(error, response, body) {
