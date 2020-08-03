@@ -73,7 +73,6 @@ app.get("/login", (req, res) => {
     res.render("login");
 });
 
-
 app.get("/home", (req, res) => {
 
     var request = require("request");
@@ -96,10 +95,11 @@ app.get("/home", (req, res) => {
                 //    response.body.reports[response.body.reports.length - 1].status = "completed";
                 // response.body.reports[response.body.reports.length - 1].msg = "completeda";
                 response.body.reports = response.body.reports.reverse();
-
+                console.log(req.cookies.officeId);
                 var x = 0;
                 for (var i = 0; i < response.body.reports.length; i++) {
                     response.body.reports[i].date = dateFormat(new Date(response.body.reports[i].date).toISOString(), "dddd, mmmm dS, yyyy, h:MM:ss TT");
+                    response.body.reports[i].officeId = req.cookies.officeId;
                     //        response.body.reports[i].loc = response.body.reports[i].replace(" ", ',');
                     if (response.body.reports[i].status == "completed") {
                         x++;
@@ -111,7 +111,8 @@ app.get("/home", (req, res) => {
                     reports: response.body.reports,
                     pendingRequests: response.body.reports.length - x,
                     totalRequests: response.body.reports.length,
-                    resolvedRequests: x
+                    resolvedRequests: x,
+                    officeId: req.cookies.officeId
                 });
             }
         }
