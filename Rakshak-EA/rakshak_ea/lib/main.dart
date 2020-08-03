@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rakshak_ea/constants.dart';
 import 'package:rakshak_ea/screens/loading_screen.dart';
 
 void main() {
@@ -13,7 +12,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Rakshak-Hero',
       theme: ThemeData(
-//        accentColor: kBlack,
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
