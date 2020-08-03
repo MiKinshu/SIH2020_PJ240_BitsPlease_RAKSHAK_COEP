@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
 import 'package:rakshak_ea/components/input_box.dart';
 import 'package:rakshak_ea/components/template_column.dart';
 import 'package:rakshak_ea/constants.dart';
@@ -53,6 +54,20 @@ class _ProfileSetupState extends State<ProfileSetup> {
     prefs.setString(kPrefToken, token);
   }
 
+  Future<String> registerUser() async{
+    try {
+      var response = await post('https://rakshak-zs.herokuapp.com/useoffice',
+          body: {
+            "officeId": idText.text,
+            "uid": uid,
+          });
+      return response.body;
+    }
+    catch(e){
+      print('Unable to register officer');
+    }
+  }
+
   saveProfile() async{
 
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -74,7 +89,12 @@ class _ProfileSetupState extends State<ProfileSetup> {
 
     saveDataInFirebase();
 
-    //TODO: Send a post request to server
+    //Send a GET request to server to register officer
+    String responseBody = await registerUser();
+    if(responseBody!='Updated!'){
+      Fluttertoast.showToast(msg: 'Office Id Invalid');
+      return;
+    }
 
     saveDataLocally();
 
@@ -82,7 +102,10 @@ class _ProfileSetupState extends State<ProfileSetup> {
       builder: (context)=>HomeScreen(
         name: nameText.text,
         officerId: idText.text,
-        phoneNo: widget.phoneNumber,)
+        phoneNo: widget.phoneNumber,
+        token: token,
+        uid: uid,
+      )
     ));
   }
 

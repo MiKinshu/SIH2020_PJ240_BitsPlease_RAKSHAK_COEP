@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart';
 import 'package:rakshak_ea/components/emergency_tile.dart';
 import 'package:rakshak_ea/constants.dart';
 import 'package:rakshak_ea/emergency.dart';
@@ -25,27 +28,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  List<Emergency> emergencies = [
-    Emergency(
-        emergencyType: 'Emergency headline',
-        reportedBy: 'Manthan Surkar',
-        reportedAt: '11:05 am, Aug-03-2020',
-        location: 'Area Details',
-        phoneNo: '+916584962136'),
-    Emergency(
-        emergencyType: 'Emergency headline',
-        reportedBy: 'Roshni Prajapati',
-        reportedAt: '12:34 am, Aug-02-2020',
-        location: 'Area Details',
-        phoneNo: '+919598227422'),
-  ];
+  List<Emergency> emergenciesAll = [];
+  List<Emergency> emergenciesOngoing = [];
+  List<Emergency> emergenciesCompleted = [];
 
   listenForNotifications(){
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print('on message $message');
-        Notifications().generate(message['data']['title'], '${message['data']['body']} reported this emergency');
+        Notifications().generate(message['data']['title'], '${message['data']['body']}');
       },
       onResume: (Map<String, dynamic> message) async {
         print('on resume $message');
@@ -56,10 +48,43 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  fetchEmergencies() async{
+
+    while(mounted){
+      await Future.delayed(Duration(seconds: 2),(){
+      });
+
+      try {
+        var response = await get(
+            'https://rakshak-zs.herokuapp.com/getreports/${widget.uid}');
+        var emergencies = jsonDecode(response.body);
+
+        List<Emergency> emergencyList = [];
+        for (var item in emergencies) {
+          Emergency emergency = Emergency(
+            emergencyType: item['type'],
+            reportedBy: item['name'],
+            reportedAt: item['date'],
+            phoneNo: item['phone'],
+            location: item['loc'],
+          );
+          emergencyList.add(emergency);
+        }
+        setState(() {
+          emergenciesAll = emergencyList;
+        });
+
+      }
+      catch(e){
+        print(e);
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    //TODO: Fetch Data via Post Requests
+    fetchEmergencies();
     listenForNotifications();
   }
 
@@ -112,39 +137,40 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
           body: TabBarView(
             children: [
+              emergenciesAll.isEmpty?Center(child: Text('No Emergency Right Now :)'),):
               ListView.builder(
-                itemCount: emergencies.length,
+                itemCount: emergenciesAll.length,
                 itemBuilder: (context, index) {
                   return EmergencyTile(
-                    emergencyType: emergencies[index].emergencyType,
-                    reportedAt: emergencies[index].reportedAt,
-                    reportedBy: emergencies[index].reportedBy,
-                    phoneNo: emergencies[index].phoneNo,
-                    location: emergencies[index].location,
+                    emergencyType: emergenciesAll[index].emergencyType,
+                    reportedAt: emergenciesAll[index].reportedAt,
+                    reportedBy: emergenciesAll[index].reportedBy,
+                    phoneNo: emergenciesAll[index].phoneNo,
+                    location: emergenciesAll[index].location,
                   );
                 },
               ),
               ListView.builder(
-                itemCount: emergencies.length,
+                itemCount: emergenciesAll.length,
                 itemBuilder: (context, index) {
                   return EmergencyTile(
-                    emergencyType: emergencies[index].emergencyType,
-                    reportedAt: emergencies[index].reportedAt,
-                    reportedBy: emergencies[index].reportedBy,
-                    phoneNo: emergencies[index].phoneNo,
-                    location: emergencies[index].location,
+                    emergencyType: emergenciesAll[index].emergencyType,
+                    reportedAt: emergenciesAll[index].reportedAt,
+                    reportedBy: emergenciesAll[index].reportedBy,
+                    phoneNo: emergenciesAll[index].phoneNo,
+                    location: emergenciesAll[index].location,
                   );
                 },
               ),
               ListView.builder(
-                itemCount: emergencies.length,
+                itemCount: emergenciesCompleted.length,
                 itemBuilder: (context, index) {
                   return EmergencyTile(
-                    emergencyType: emergencies[index].emergencyType,
-                    reportedAt: emergencies[index].reportedAt,
-                    reportedBy: emergencies[index].reportedBy,
-                    phoneNo: emergencies[index].phoneNo,
-                    location: emergencies[index].location,
+                    emergencyType: emergenciesCompleted[index].emergencyType,
+                    reportedAt: emergenciesCompleted[index].reportedAt,
+                    reportedBy: emergenciesCompleted[index].reportedBy,
+                    phoneNo: emergenciesCompleted[index].phoneNo,
+                    location: emergenciesCompleted[index].location,
                   );
                 },
               ),

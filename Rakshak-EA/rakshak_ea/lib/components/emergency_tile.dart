@@ -80,7 +80,7 @@ class EmergencyTile extends StatelessWidget {
                         children: <Widget>[
                           Text('Contact Number:'),
                           SizedBox(width: 10,),
-                          Text('+91 9598227422',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.grey[700]),),
+                          Text(phoneNo,style: TextStyle(fontWeight: FontWeight.bold,color: Colors.grey[700]),),
                         ],
                       ),
                     ),
@@ -109,7 +109,12 @@ class EmergencyTile extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),
                                 onPressed: (){
-                                  _launchMaps('25.4358', '81.8463');
+                                  //Separate lat and lon from location here
+                                  String lat,lon;
+                                  var loc = location.split(' ');
+                                  lat = loc[0]??'25.4358';
+                                  lon = loc[1]??'81.8463';
+                                  _launchMaps(lat,lon);
                                 },
                                 color: Color(0xFFD93C33),
                                 child: Row(
