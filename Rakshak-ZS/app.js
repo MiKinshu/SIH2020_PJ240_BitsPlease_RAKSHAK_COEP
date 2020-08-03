@@ -97,13 +97,17 @@ app.get("/network", (req, res) => {
 app.post("/useoffice", (req, res) => {
     console.log(req.body);
     Office.findOne({ officeId: req.body.officeId }, (err, office) => {
-        if(office==null) res.send("no network found");
-        office.officers.push(req.body.uid);
+        if(office==null){
+            res.send("no network found");
+        }
+        else {
+            office.officers.push(req.body.uid);
         
         office.save((err) => {
             if (err) res.send("Something went wrong");
             res.send("Updated!");
         })
+        }
     })
 });
 app.post("/usenetwork", (req, res) => {
@@ -114,12 +118,14 @@ app.post("/usenetwork", (req, res) => {
         });
     Network.findOne({ networkId: req.body.networkId }, (err, network) => {
         if(network==null) res.send("no network found");
-        network.users.push(req.body.uid);
+        else{
+            network.users.push(req.body.uid);
         
         network.save((err) => {
             if (err) res.send("Something went wrong");
             res.send("Updated!");
         })
+        }
     })
 });
 
