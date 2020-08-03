@@ -245,11 +245,6 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     Intent intent = new Intent(MainActivity.this, SearchSafety.class);
                     startActivity(intent);
-
-
-
-//                    Intent intent = new Intent(MainActivity.this, SearchSafety.class);
-//                    startActivity(intent);
                 }
             });
 
@@ -257,12 +252,12 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setTitle("Enter your organisation network ID key");
+                    builder.setTitle(getString(R.string.Enter_your_organisation_network_ID_key));
 
                     final EditText input = new EditText(MainActivity.this);
                     builder.setView(input);
 
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             RequestBody body = new FormBody.Builder()
@@ -273,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
                                     .url(getResources().getString(R.string.server) + "usenetwork")
                                     .post(body)
                                     .build();
-                            Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), getString(R.string.Trying_to_Login), Toast.LENGTH_LONG).show();
 
                             client.newCall(request).enqueue(new Callback() {
 
@@ -285,11 +280,11 @@ public class MainActivity extends AppCompatActivity {
                                             MainActivity.this.runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    try {
-                                                        Toast.makeText(getApplicationContext(), response.body().string(), Toast.LENGTH_SHORT).show();
-                                                    } catch (IOException e) {
-                                                        e.printStackTrace();
-                                                    }
+//                                                    try {
+//                                                        Toast.makeText(getApplicationContext(), response.body().string(), Toast.LENGTH_SHORT).show();
+//                                                    } catch (IOException e) {
+//                                                        e.printStackTrace();
+//                                                    }
                                                 }
                                             });
                                         }
@@ -304,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
                             organisation = input.getText().toString();
                         }
                     });
-                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    builder.setNegativeButton(getString(R.string.Cancel), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
@@ -314,7 +309,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            String[] spinnerEmergencylist = {"General Emergency", "Medical", "Fire", "Disaster"};
+
+            String[] spinnerEmergencylist = {getString(R.string.General_Emergency), getString(R.string.Medical), getString(R.string.Fire), getString(R.string.Disaster)};
             ArrayAdapter<String> spinnerEmergencyAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, spinnerEmergencylist);
             spinnerEmergencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(spinnerEmergencyAdapter);
@@ -343,8 +339,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
-    void openSafety(String res){
-    }
+
     //Getting location of user.
     @SuppressLint("MissingPermission")
     protected void getloc() {
