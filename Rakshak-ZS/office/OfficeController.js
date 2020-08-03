@@ -2,20 +2,63 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
+const admin = require("../firebase");
 const Report = require("../Report");
 const VerifyToken = require("./VerifyToken");
-
+const cookieParser = require("cookie-parser"); 
 
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
+router.use(cookieParser());
 const Office = require("./Office");
-
+const Officers = admin.database().ref("Officers");
+const Users = admin.database().ref("Users");
 /**
  * Configure JWT
  */
 var jwt = require("jsonwebtoken"); // used to create, sign, and verify tokens
 var bcrypt = require("bcryptjs");
 var config = require("./config"); // get config file
+const verifyToken = require("../network/VerifyToken");
+
+const messages = (registrationToken) => {
+    var message = {
+        data: {
+            title: "Work time!",
+            body: "You have been assigned a mission"
+        },
+        token: registrationToken
+    };
+    console.log(message);
+    admin.messaging().send(message)
+        .then((response) => {
+            console.log('Successfully sent message:' + registrationToken, response);
+        })
+        .catch((error) => {
+            console.log('Error sending message:' + registrationToken, error);
+        });
+};
+
+const messageus = (registrationToken, location, type, msg, reportID) => {
+    var message = {
+        data: {
+            name: reportID,
+            loc: location,
+            type: type,
+            msg: msg,
+            status: "2"
+        },
+        token: registrationToken
+    };
+    console.log(message);
+    admin.messaging().send(message)
+        .then((response) => {
+            console.log('Successfully sent message:' + registrationToken, response);
+        })
+        .catch((error) => {
+            console.log('Error sending message:' + registrationToken, error);
+        });
+};
 
 router.post("/login", function(req, res) {
     console.log(req.body);
@@ -71,24 +114,77 @@ router.post("/register", function(req, res) {
     );
 });
 
-router.get("/assign/:reportId", (req, res) => {
-    console.log(req.body);
+router.get("/assign/:reportId/:officeId", (req, res) => {
+    const officeId = req.params.officeId;
+    console.log(officeId);
     Report.findById(req.params.reportId, (err, report) => {
         if (err) {
             console.log(err);
             res.send("Something went Wrong");
         }
-        report.status = "assigned";
-        report.officerId = "prateek123";
-        const dummyOfficers = ["Manthan", "Prateek", "Ritik", "Mrigyen"];
-        const dummyNumbers = ["7776789899", "7776744499", "9876789899", "6616789899"];
-        const k = Math.floor(Math.random() * 4);
-        report.officerName = dummyOfficers[k];
-        report.save((err) => {
-            if (err) res.send("Something went wrong");
-            console.log("done")
-            res.redirect("https://rakshak-es.herokuapp.com/home");
-        });
+        Office.findOne({officeId: officeId}, (err, office)=>{
+            if (err) {
+                console.log(err);
+                res.send("Something went Wrong");
+            }
+            let officerz = [];
+            if(office!==null) officerz = office.officers;
+            if(officerz.length==0){
+                report.status = "assigned";
+                report.officerID = "prateek123";
+                const dummyOfficers = ["Manthan", "Prateek", "Ritik", "Mrigyen"];
+                const dummyNumbers = ["7776789899", "7776744499", "9876789899", "6616789899"];
+                const k = Math.floor(Math.random() * 4);
+                report.officerName = dummyOfficers[k];
+                report.save((err) => {
+                    if (err) res.send("Something went wrong");
+                    console.log("done");
+                    Users.on("value", function(snapshot) {
+                        let tokens = snapshot.val();
+                        Object.keys(tokens).forEach(function(key) {
+                            //Decide whether the current key is viable for sending the message
+                            if (key==report.uid) {
+                                //console.log(tokens[key]);
+                                messageus(tokens[key].Token, "18 71", "general", "kuch bhi", report.officerName);
+                            }
+                        });
+                    }, function(errorObject) {
+                        console.log("The read failed: " + errorObject.code);
+                    });
+                    res.redirect("https://rakshak-es.herokuapp.com/home");
+                });
+            }
+            else{
+                const officer = officerz[officerz.length-1];
+                console.log(officer);
+                Officers.on("value", function(snapshot) {
+                    let tokens = snapshot.val();
+                    messages(tokens[officer].token);
+                    report.status = "assigned";
+                    report.officerID = officer;
+                    report.officerName = tokens[officer].name;
+                    report.save((err) => {
+                        if (err) res.send("Something went wrong");
+                        console.log("done");
+                        Users.on("value", function(snapshot) {
+                            let tokens = snapshot.val();
+                            Object.keys(tokens).forEach(function(key) {
+                                //Decide whether the current key is viable for sending the message
+                                if (key==report.uid) {
+                                    //console.log(tokens[key]);
+                                    messageus(tokens[key].Token, "18 71", "general", "kuch bhi", report.officerName);
+                                }
+                            });
+                        }, function(errorObject) {
+                            console.log("The read failed: " + errorObject.code);
+                        });
+                        res.redirect("https://rakshak-es.herokuapp.com/home");
+                    });
+                }, function(errorObject) {
+                    console.log("The read failed: " + errorObject.code);
+                });
+            }
+        })
     })
 })
 

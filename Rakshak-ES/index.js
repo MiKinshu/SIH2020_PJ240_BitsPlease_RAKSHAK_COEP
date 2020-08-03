@@ -1,6 +1,7 @@
 //calling express
 var express = require("express");
 app = express();
+var dateFormat = require('dateformat');
 
 //handle bars with section
 var handlebars = require("express-handlebars").create({
@@ -72,7 +73,6 @@ app.get("/login", (req, res) => {
     res.render("login");
 });
 
-
 app.get("/home", (req, res) => {
 
     var request = require("request");
@@ -90,13 +90,16 @@ app.get("/home", (req, res) => {
                 console.log("haa");
                 res.redirect("login");
             } else {
-                // console.log(response.body.reports);
+                // console.logas(response.body.reports);
                 //response.body.reports[0].status = "completed";
                 //    response.body.reports[response.body.reports.length - 1].status = "completed";
                 // response.body.reports[response.body.reports.length - 1].msg = "completeda";
                 response.body.reports = response.body.reports.reverse();
+                console.log(req.cookies.officeId);
                 var x = 0;
                 for (var i = 0; i < response.body.reports.length; i++) {
+                    response.body.reports[i].date = dateFormat(new Date(response.body.reports[i].date).toISOString(), "dddd, mmmm dS, yyyy, h:MM:ss TT");
+                    response.body.reports[i].officeId = req.cookies.officeId;
                     //        response.body.reports[i].loc = response.body.reports[i].replace(" ", ',');
                     if (response.body.reports[i].status == "completed") {
                         x++;
@@ -108,7 +111,8 @@ app.get("/home", (req, res) => {
                     reports: response.body.reports,
                     pendingRequests: response.body.reports.length - x,
                     totalRequests: response.body.reports.length,
-                    resolvedRequests: x
+                    resolvedRequests: x,
+                    officeId: req.cookies.officeId
                 });
             }
         }
@@ -129,12 +133,13 @@ app.post("/register", (req, res) => {
                 name: req.body.name,
                 password: req.body.password,
                 officeId: req.body.officeId,
-                Type: req.body.type
+                type: req.body.type
             }
         },
         function(error, response, body) {
             if (!error && response != null & response.body.auth == true) {
                 res.cookie("auth", response.body.token);
+                res.cookie("officeId", req.body.officeId);
                 res.redirect("home");
             } else {
                 console.log("ere");
@@ -165,6 +170,7 @@ app.post("/login", (req, res) => {
             //  console.log(response);
             if (!error && response != null && response.body.auth == true) {
                 res.cookie("auth", response.body.token);
+                res.cookie("officeId", req.body.officeId);
                 res.redirect("home");
             } else {
                 res.redirect("login");

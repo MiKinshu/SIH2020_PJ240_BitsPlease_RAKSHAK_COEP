@@ -38,117 +38,95 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             Log.w("Exception", e.toString());
         }
         Log.d(TAG, "onMessageReceived: Recieved"+remoteMessage.getData());
+        String type = remoteMessage.getData().get("status");
 
-        String emergencyType,title,message;
-        emergencyType = remoteMessage.getData().get("type");
-        assert emergencyType != null;
-        if (emergencyType.equalsIgnoreCase("general"))
+        if(type.equals("0")) {
+
+            String emergencyType, title, message;
+            emergencyType = remoteMessage.getData().get("type");
+            assert emergencyType != null;
+            if (emergencyType.equalsIgnoreCase("general")) {
+                title = "General Emergency";
+                message = getString(R.string.general_message);
+            } else if (emergencyType.equalsIgnoreCase("fire")) {
+                title = "Fire Alert";
+                message = getString(R.string.fire_message);
+            } else if (emergencyType.equalsIgnoreCase("medical")) {
+                title = "Medical Help";
+                message = getString(R.string.medical_message);
+            } else {
+                title = "Disaster Alert";
+                message = getString(R.string.disaster_message);
+            }
+            String lat = "-1", lon = "-1";
+            try {
+                String[] location = Objects.requireNonNull(remoteMessage.getData().get("loc")).split(" ", 2);
+                Log.d("location", location[0] + " " + location[1]);
+                lat = location[0];
+                lon = location[1];
+            } catch (Exception e) {
+                Log.w("Exception caught in calculating distance from emergency ", e.toString());
+            }
+            showNotification(FirebaseMessagingService.this, title, message, lat, lon, 0);
+        }
+        else if(type.equals("2"))
         {
-            title="General Emergency";
-            message=getString(R.string.general_message);
+            String name = "Abhishek1";
+            name = remoteMessage.getData().get("name");
+            String body = "Emergency has been assigned to : " + name;
+            showNotification(FirebaseMessagingService.this, "Assigned!", body, "0", "0", 2);
         }
-        else if(emergencyType.equalsIgnoreCase("fire"))
-        {
-            title="Fire Alert";
-            message=getString(R.string.fire_message);
-        }
-        else if (emergencyType.equalsIgnoreCase("medical"))
-        {
-            title="Medical Help";
-            message=getString(R.string.medical_message);
-        }
-        else{
-            title="Disaster Alert";
-            message=getString(R.string.disaster_message);
-        }
-        String dis = "-1";
-        double distance = -1.0;
-        String lat ="-1",lon = "-1";
-        try {
-            String[] location = Objects.requireNonNull(remoteMessage.getData().get("loc")).split(" ", 2);
-            Log.d("location", location[0]+" "+location[1]);
-//            if (location.length > 2)
-//                distance = getDistanceFromEmergency(location[0], location[1]);
-            message = message + "\nEmergency received at distance = " + distance + " KM";
-            //dis = String.valueOf(distance);
-            lat = location[0];
-            lon = location[1];
-        }
-        catch (Exception e){
-            Log.w("Exception caught in calculating distance from emergency ", e.toString());
-        }
-        showNotification(FirebaseMessagingService.this, title, message,lat,lon);
-        Log.d(TAG, "Message=" + message);
         super.onMessageReceived(remoteMessage);
     }
 
-    double getDistanceFromEmergency(String lat1,String lon1) {
-        String lat2= mLat;
-        String lon2 = mLon;
-        return distance(Double.parseDouble(lat1),Double.parseDouble(lon1),Double.parseDouble(lat2),Double.parseDouble(lon2));
-    }
-
-    private double distance(double lat1, double lon1, double lat2, double lon2) {
-        double theta = lon1 - lon2;
-        double dist = Math.sin(deg2rad(lat1))
-                * Math.sin(deg2rad(lat2))
-                + Math.cos(deg2rad(lat1))
-                * Math.cos(deg2rad(lat2))
-                * Math.cos(deg2rad(theta));
-        dist = Math.acos(dist);
-        dist = rad2deg(dist);
-        dist = dist * 60 * 1.1515;
-        Log.d("Distance: ", " "+dist);
-        return (dist);
-    }
-
-    private double deg2rad(double deg) {
-        return (deg * Math.PI / 180.0);
-    }
-
-    private double rad2deg(double rad) {
-        return (rad * 180.0 / Math.PI);
-    }
-
-    public void showNotification(Context context, String title, String body,String lat,String lon) {
+    public void showNotification(Context context, String title, String body,String lat,String lon, int type) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
         int notificationId = (int)System.currentTimeMillis();;
         String channelId = "channel-01";
         String channelName = "Channel Name";
         int importance = NotificationManager.IMPORTANCE_HIGH;
 
-        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + lat + "," + lon);
-        Log.d("URI", ""+gmmIntentUri);
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
-//        mapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(mapIntent);
+        if(type == 0) {
+            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + lat + "," + lon);
+            Log.d("URI", "" + gmmIntentUri);
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
 
-//        String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?q=loc:%f,%f", 28.43242324,77.8977673);
-//        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-//        startActivity(intent);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel mChannel = new NotificationChannel(
+                        channelId, channelName, importance);
+                notificationManager.createNotificationChannel(mChannel);
+            }
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel mChannel = new NotificationChannel(
-                    channelId, channelName, importance);
-            notificationManager.createNotificationChannel(mChannel);
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(title)
+                    .setContentText(body);
+            mBuilder.setAutoCancel(true);
+
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addNextIntent(mapIntent);
+            PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
+                    0,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+            );
+            mBuilder.setContentIntent(resultPendingIntent);
+
+            notificationManager.notify(notificationId, mBuilder.build());
         }
+        else{
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel mChannel = new NotificationChannel(
+                        channelId, channelName, importance);
+                notificationManager.createNotificationChannel(mChannel);
+            }
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(title)
-                .setContentText(body);
-        mBuilder.setAutoCancel(true);
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addNextIntent(mapIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        );
-        mBuilder.setContentIntent(resultPendingIntent);
-
-        notificationManager.notify(notificationId, mBuilder.build());
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(title)
+                    .setContentText(body);
+            mBuilder.setAutoCancel(true);
+            notificationManager.notify(notificationId, mBuilder.build());
+        }
     }
 }

@@ -83,7 +83,7 @@ public class SearchSafety extends AppCompatActivity {
                                         //prediction = response.body().string();
 
                                       txtView.setText(String.valueOf(100-Double.parseDouble(response.body().string())));
-                                        txtView.setVisibility(View.VISIBLE);
+                                      txtView.setVisibility(View.VISIBLE);
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
