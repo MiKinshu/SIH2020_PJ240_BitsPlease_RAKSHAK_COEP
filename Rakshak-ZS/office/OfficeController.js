@@ -18,6 +18,7 @@ const Officers = admin.database().ref("Officers");
 var jwt = require("jsonwebtoken"); // used to create, sign, and verify tokens
 var bcrypt = require("bcryptjs");
 var config = require("./config"); // get config file
+const verifyToken = require("../network/VerifyToken");
 
 const messages = (registrationToken) => {
     var message = {
@@ -91,8 +92,8 @@ router.post("/register", function(req, res) {
     );
 });
 
-router.get("/assign/:reportId", (req, res) => {
-    const officeId = req.cookies['officeId'];
+router.get("/assign/:reportId/:officeId", verifyToken, (req, res) => {
+    const officeId = req.params.officeId;
     console.log(officeId);
     Report.findById(req.params.reportId, (err, report) => {
         if (err) {
@@ -104,7 +105,8 @@ router.get("/assign/:reportId", (req, res) => {
                 console.log(err);
                 res.send("Something went Wrong");
             }
-            const officerz = office.officers;
+            let officerz = [];
+            if(office!==null) officerz = office.officers;
             if(officerz.length==0){
                 report.status = "assigned";
                 report.officerID = "prateek123";
@@ -129,7 +131,7 @@ router.get("/assign/:reportId", (req, res) => {
                     report.officerName = tokens[officer].name;
                     report.save((err) => {
                         if (err) res.send("Something went wrong");
-                        console.log("done")
+                        console.log("done");
                         res.redirect("https://rakshak-es.herokuapp.com/home");
                     });
                 }, function(errorObject) {
