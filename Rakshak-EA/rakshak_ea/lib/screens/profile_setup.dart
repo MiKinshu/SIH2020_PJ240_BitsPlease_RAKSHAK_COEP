@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -24,11 +25,12 @@ class _ProfileSetupState extends State<ProfileSetup> {
   PageController _pageController = PageController();
   String fullName;
   String token;
+  String uid;
 
   saveDataInFirebase(){
     //Save data to firebase
     final dbRef = FirebaseDatabase.instance.reference().child("Officers");
-    dbRef.push().set({
+    dbRef.child(uid).set({
       "name": nameText.text,
       "officeId": idText.text ,
       "phoneNo": widget.phoneNumber,
@@ -47,6 +49,8 @@ class _ProfileSetupState extends State<ProfileSetup> {
     prefs.setString(kPrefName,nameText.text);
     prefs.setString(kPrefOfficeId, idText.text);
     prefs.setString(kPrefPhoneNo, widget.phoneNumber);
+    prefs.setString(kPrefUID, uid);
+    prefs.setString(kPrefToken, token);
   }
 
   saveProfile() async{
@@ -55,6 +59,11 @@ class _ProfileSetupState extends State<ProfileSetup> {
     await _firebaseMessaging.getToken().then((t){
       print(t);
       token = t;
+    });
+
+    await FirebaseAuth.instance.currentUser().then((value){
+      uid = value.uid;
+      print(uid);
     });
 
 

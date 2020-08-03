@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../constants.dart';
 
 class EmergencyTile extends StatelessWidget {
@@ -108,6 +109,7 @@ class EmergencyTile extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),
                                 onPressed: (){
+                                  _launchMaps('25.4358', '81.8463');
                                 },
                                 color: Color(0xFFD93C33),
                                 child: Row(
@@ -129,6 +131,7 @@ class EmergencyTile extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),
                                 onPressed: (){
+                                  launch("tel: $phoneNo");
                                 },
                                 color: Color(0xFF5FD855),
                                 child: Row(
@@ -152,5 +155,13 @@ class EmergencyTile extends StatelessWidget {
         ),
       ),
     );
+  }
+  _launchMaps(String lat,String lon) async {
+    String url = 'https://www.google.com/maps/search/?api=1&query=$lat,$lon';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
