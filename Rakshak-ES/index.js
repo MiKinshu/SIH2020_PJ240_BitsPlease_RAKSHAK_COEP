@@ -135,6 +135,7 @@ app.post("/register", (req, res) => {
         function(error, response, body) {
             if (!error && response != null & response.body.auth == true) {
                 res.cookie("auth", response.body.token);
+                res.cookie("officeId", req.body.officeId);
                 res.redirect("home");
             } else {
                 console.log("ere");
@@ -165,6 +166,7 @@ app.post("/login", (req, res) => {
             //  console.log(response);
             if (!error && response != null && response.body.auth == true) {
                 res.cookie("auth", response.body.token);
+                res.cookie("officeId", req.body.officeId);
                 res.redirect("home");
             } else {
                 res.redirect("login");

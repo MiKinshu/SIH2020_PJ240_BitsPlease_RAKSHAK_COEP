@@ -25,7 +25,7 @@ const OfficeController = require("./office/OfficeController");
 app.use("/office", OfficeController);
 
 const Network = mongoose.model("Network");
-
+const Office = mongoose.model("Office");
 //Getting the Users db
 const Users = admin.database().ref("Users");
 
@@ -93,6 +93,16 @@ app.get("/network", (req, res) => {
 
 //Medical Fire Disaster General Emergency
 //route to register on a network
+app.post("/useoffice", (req, res) => {
+    console.log(req.body);
+    Office.findOne({ officeId: req.body.officeId }, (err, office) => {
+        office.officers.push(req.body.uid);
+        office.save((err) => {
+            if (err) res.send("Something went wrong");
+            res.send("Updated!");
+        })
+    })
+});
 app.post("/usenetwork", (req, res) => {
     console.log(req.body);
     Network.findOne({ networkId: req.body.networkId }, (err, network) => {
@@ -103,6 +113,17 @@ app.post("/usenetwork", (req, res) => {
         })
     })
 });
+
+app.get("/getreports/:officerId", (req, res)=>{
+    console.log(req.params.officerId);
+    Report.find({officerID: req.params.officerId},(err, reports)=>{
+        if(err){
+            console.log(err);
+            res.send("Id does not match");
+        }
+        res.send(reports);
+    });
+})
 
 // Network Server Raisng an alert, sends everyone in the network a notification
 app.post("/raiseAlert", function(req, res) {
@@ -125,10 +146,6 @@ app.post("/raiseAlert", function(req, res) {
     });
 });
 
-//temp
-app.get("/sendnote",(req, res)=>{
-    messages("dKTGwXzSRaepmgk2hJKYMu:APA91bF_lD_HjsxxorAL7u0pvGo0QbyMaKaax7ejbTGAA3xnsC2HNHgwuRvQUhvXu1ynWPJam3cMntLFC9vq2GIPkFKo9PMAc4ebLz_AWNW17H0SgL9c-Wbn5OsipVE9Rm_JDasuwPde");
-})
 
 // Handling requests from Users
 app.post("/requests", (req, res) => {
