@@ -50,6 +50,25 @@ const message = (registrationToken, location, type, msg, reportID) => {
         });
 };
 
+//Function for sending notifications
+const messages = (registrationToken) => {
+    var message = {
+        data: {
+            title: "Notification aaya",
+            body: "Hello Ritik"
+        },
+        token: registrationToken
+    };
+    console.log(message);
+    admin.messaging().send(message)
+        .then((response) => {
+            console.log('Successfully sent message:' + registrationToken, response);
+        })
+        .catch((error) => {
+            console.log('Error sending message:' + registrationToken, error);
+        });
+};
+
 //--------------------Routes--------------------------//
 
 // Trivial Route
@@ -108,7 +127,7 @@ app.post("/raiseAlert", function(req, res) {
 
 //temp
 app.get("/sendnote",(req, res)=>{
-    message("d7WYnst6RXuu0S2FR_OT2T:APA91bE-rMOjtcMjbf9gp-lE-gi74TvpPUzsq5Ib07wpyYxtwjFUpRVj4Byp8mpWBmGlTo8-RKywtG4NNuwWo0ONC2eJF3o_M50MqBkDMGgrVS8-pmILqCS7AU_Qk6NMdzyck_dsgorA", "18 71", "general", "pro", "");
+    messages("dKTGwXzSRaepmgk2hJKYMu:APA91bF_lD_HjsxxorAL7u0pvGo0QbyMaKaax7ejbTGAA3xnsC2HNHgwuRvQUhvXu1ynWPJam3cMntLFC9vq2GIPkFKo9PMAc4ebLz_AWNW17H0SgL9c-Wbn5OsipVE9Rm_JDasuwPde");
 })
 
 // Handling requests from Users

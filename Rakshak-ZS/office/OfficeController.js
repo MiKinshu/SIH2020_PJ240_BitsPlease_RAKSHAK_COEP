@@ -100,11 +100,11 @@ router.post("/me", VerifyToken, function(req, res, next) {
         if (!office) return res.status(404).send({ "auth": false });
 
         var type = "General Emergency";
-        if (office.Type == 0) {
+        if (office.Type == 1) {
             type = "Medical";
-        } else if (office.Type == 1) {
-            type = "General Emergency";
         } else if (office.Type == 2) {
+            type = "General Emergency";
+        } else if (office.Type == 3) {
             type = "Fire";
         } else if (office.Type == 4) {
             type = "Disaster";
