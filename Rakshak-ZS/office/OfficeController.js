@@ -92,7 +92,7 @@ router.post("/register", function(req, res) {
     );
 });
 
-router.get("/assign/:reportId/:officeId", verifyToken, (req, res) => {
+router.get("/assign/:reportId/:officeId", (req, res) => {
     const officeId = req.params.officeId;
     console.log(officeId);
     Report.findById(req.params.reportId, (err, report) => {
