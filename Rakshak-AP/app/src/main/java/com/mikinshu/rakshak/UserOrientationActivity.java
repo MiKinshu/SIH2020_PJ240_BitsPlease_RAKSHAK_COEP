@@ -28,7 +28,6 @@ public class UserOrientationActivity extends AppCompatActivity {
                 Name = etname.getText().toString();
                 AADHAAR = etaadhaar.getText().toString();
                 MedicalCondition = etMedCon.getText().toString();
-
                 Intent intent = new Intent();
                 intent.putExtra("Name", Name);
                 intent.putExtra("MedicalCondition", MedicalCondition);
