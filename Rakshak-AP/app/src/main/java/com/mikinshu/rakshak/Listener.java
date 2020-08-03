@@ -87,6 +87,8 @@ public class Listener extends Service {
             public void onReceived(byte[] data, int channel) {
                 if (data != null) {
                     String identifier = new String(data);
+                    Toast.makeText(Listener.this, "Received Message", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onReceived: identifier is "+ identifier);
                     Log.v(TAG, "Received " + identifier);
                     if(!isNetworkAvailable()) {
                         //sending w/o signal

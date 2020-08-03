@@ -71,10 +71,10 @@ router.post("/register", function(req, res) {
     );
 });
 
-router.get("/assign/:reportId", (req, res)=>{
+router.get("/assign/:reportId", (req, res) => {
     console.log(req.body);
-    Report.findById(req.params.reportId, (err, report)=>{
-        if(err){
+    Report.findById(req.params.reportId, (err, report) => {
+        if (err) {
             console.log(err);
             res.send("Something went Wrong");
         }
@@ -100,13 +100,13 @@ router.post("/me", VerifyToken, function(req, res, next) {
         if (!office) return res.status(404).send({ "auth": false });
 
         var type = "General Emergency";
-        if (office.type == 0) {
+        if (office.Type == 1) {
             type = "Medical";
-        } else if (office.type == 1) {
+        } else if (office.Type == 2) {
             type = "General Emergency";
-        } else if (office.type == 2) {
+        } else if (office.Type == 3) {
             type = "Fire";
-        } else if (office.type == 4) {
+        } else if (office.Type == 4) {
             type = "Disaster";
         }
 

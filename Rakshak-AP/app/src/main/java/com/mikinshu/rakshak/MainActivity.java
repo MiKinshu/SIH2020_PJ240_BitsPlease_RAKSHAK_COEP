@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
             mUsersDatabaseReference.child("EmergencyContact1").setValue(EmergencyContact1);
             mUsersDatabaseReference.child("EmergencyContact2").setValue(EmergencyContact2);
             mUsersDatabaseReference.child("DOB").setValue(DOB);
-            mUsersDatabaseReference.child("NetworkID").setValue("IIITA");
+            mUsersDatabaseReference.child("NetworkID").setValue("Unknown Network");
             mUsersDatabaseReference.child("AADHAAR").setValue(AADHAAR);
         } else Log.d(TAG, "PutUserDataToFirebase: FireBase Error - Cannot find logged in user.");
     }
